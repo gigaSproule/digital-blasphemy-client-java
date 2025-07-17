@@ -19,4 +19,8 @@ public enum Operator {
     Operator(String operator) {
         this.operator = operator;
     }
+
+    public String toString() {
+        return this.operator;
+    }
 }

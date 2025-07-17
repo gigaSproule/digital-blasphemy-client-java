@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ class DigitalBlasphemyClientTest {
             );
             assertThat(getAccountInformationResponse).isEqualTo(expectedGetAccountInformationResponse);
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
+            verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
         }
 
         @Test
@@ -86,7 +87,7 @@ class DigitalBlasphemyClientTest {
                     .hasFieldOrPropertyWithValue("description", "Unauthorized")
                     .extracting("errors").isNull();
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
+            verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
         }
 
         @Test
@@ -101,7 +102,7 @@ class DigitalBlasphemyClientTest {
                     .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. []")
                     .extracting("errors").isNull();
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
+            verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
         }
 
         @Test
@@ -112,7 +113,7 @@ class DigitalBlasphemyClientTest {
                     .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. [No response could be served as there are no stub mappings in this WireMock instance.]")
                     .extracting("errors").isNull();
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
+            verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
         }
     }
 
@@ -125,7 +126,9 @@ class DigitalBlasphemyClientTest {
         @ParameterizedTest
         @MethodSource("notSentQueryParamsWhenNotProvided")
         void getWallpaperDoesNotSendQueryParamIfNotProvided(String queryParam) throws IOException, URISyntaxException, ResponseException {
-            stubFor(get("/v2/core/wallpaper")
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(ok()
                             .withHeader("Content-Type", "application/json")
@@ -133,9 +136,10 @@ class DigitalBlasphemyClientTest {
                                     readFile("getWallpaperSuccessFullyPopulated.json")
                             ))));
 
-            underTest.getWallpaper();
+            underTest.getWallpaper(getWallpaperRequest);
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")).withoutQueryParam(queryParam));
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
+                    .withoutQueryParam(queryParam));
         }
 
         public static Stream<Arguments> notSentQueryParamsWhenNotProvided() {
@@ -148,7 +152,9 @@ class DigitalBlasphemyClientTest {
         @ParameterizedTest
         @MethodSource("sentQueryParamsWhenNotProvided")
         void getWallpaperDoesSendQueryParamIfNotProvided(String queryParam, String expectedValue) throws IOException, URISyntaxException, ResponseException {
-            stubFor(get("/v2/core/wallpaper")
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(ok()
                             .withHeader("Content-Type", "application/json")
@@ -156,9 +162,11 @@ class DigitalBlasphemyClientTest {
                                     readFile("getWallpaperSuccessFullyPopulated.json")
                             ))));
 
-            underTest.getWallpaper();
+            underTest.getWallpaper(getWallpaperRequest);
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")).withQueryParam(queryParam, equalTo(expectedValue)));
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*" + queryParam + "=" + expectedValue + ".*"))
+            );
         }
 
         public static Stream<Arguments> sentQueryParamsWhenNotProvided() {
@@ -174,8 +182,10 @@ class DigitalBlasphemyClientTest {
 
         @ParameterizedTest
         @MethodSource("queryParamsProvided")
-        void getWallpaperDoesSendQueryParamIfProvided(String queryParam, Object value, String expectedValue) throws IOException, URISyntaxException, ResponseException {
-            stubFor(get("/v2/core/wallpaper")
+        void getWallpaperDoesSendQueryParamIfProvided(String field, String queryParam, Object value, String expectedValue) throws IOException, URISyntaxException, ResponseException, IllegalAccessException, NoSuchFieldException {
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(ok()
                             .withHeader("Content-Type", "application/json")
@@ -183,43 +193,51 @@ class DigitalBlasphemyClientTest {
                                     readFile("getWallpaperSuccessFullyPopulated.json")
                             ))));
 
-            underTest.getWallpaper(GetWallpaperRequest.builder().build());
+            Field declaredField = GetWallpaperRequest.class.getDeclaredField(field);
+            declaredField.setAccessible(true);
+            declaredField.set(getWallpaperRequest, value);
+            declaredField.setAccessible(false);
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")).withQueryParam(queryParam, equalTo(expectedValue)));
+            underTest.getWallpaper(getWallpaperRequest);
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*" + queryParam + "=" + expectedValue + ".*"))
+            );
         }
 
         public static Stream<Arguments> queryParamsProvided() {
             return Stream.of(
-                    arguments("filter_res_height", 1, "1"),
-                    arguments("filter_res_width", 1, "1"),
-                    arguments("filter_res_operator", Operator.Equal, "%3D"),
-                    arguments("filter_res_operator_height", Operator.Equal, "%3D"),
-                    arguments("filter_res_operator_width", Operator.Equal, "%3D"),
-                    arguments("show_comments", true, "true"),
-                    arguments("show_pickle_jar", true, "true"),
-                    arguments("show_resolutions", true, "false")
+                    arguments("filterResHeight", "filter_res_height", 1, "1"),
+                    arguments("filterResWidth", "filter_res_width", 1, "1"),
+                    arguments("filterResOperator", "filter_res_operator", Operator.Equal, "%3D"),
+                    arguments("filterResOperatorHeight", "filter_res_operator_height", Operator.Equal, "%3D"),
+                    arguments("filterResOperatorWidth", "filter_res_operator_width", Operator.Equal, "%3D"),
+                    arguments("showComments", "show_comments", true, "true"),
+                    arguments("showPickleJar", "show_pickle_jar", true, "true"),
+                    arguments("showResolutions", "show_resolutions", false, "false")
             );
         }
 
         @ParameterizedTest
         @MethodSource("successfulResponse")
         void getWallpaperCanMapResponse(String response, Wallpaper expectedWallpaper) throws IOException, ResponseException {
-            stubFor(get("/v2/core/wallpaper")
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(ok()
                             .withHeader("Content-Type", "application/json")
                             .withResponseBody(new Body(response))
                     ));
 
-            Wallpaper wallpaper = underTest.getWallpaper();
+            Wallpaper wallpaper = underTest.getWallpaper(getWallpaperRequest);
 
             assertThat(wallpaper).isEqualTo(expectedWallpaper);
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")));
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         public static Stream<Arguments> successfulResponse() throws IOException, URISyntaxException {
-
             return Stream.of(
                     arguments(
                             readFile("getWallpaperSuccessFullyPopulated.json"),
@@ -267,7 +285,9 @@ class DigitalBlasphemyClientTest {
 
         @Test
         void getWallpaperCanMapUnauthorisedResponse() throws IOException, URISyntaxException {
-            stubFor(get("/v2/core/wallpaper")
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(unauthorized()
                             .withHeader("Content-Type", "application/json")
@@ -275,18 +295,20 @@ class DigitalBlasphemyClientTest {
                                     readFile("unauthorisedResponse.json")
                             ))));
 
-            assertThatThrownBy(() -> underTest.getWallpaper())
+            assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 401)
                     .hasFieldOrPropertyWithValue("description", "Unauthorized")
                     .extracting("errors").isNull();
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")));
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         @Test
         void getWallpaperCanMapBadRequestResponse() throws IOException, URISyntaxException {
-            stubFor(get("/v2/core/wallpaper")
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(badRequest()
                             .withHeader("Content-Type", "application/json")
@@ -294,7 +316,7 @@ class DigitalBlasphemyClientTest {
                                     readFile("getWallpaperBadRequest.json")
                             ))));
 
-            assertThatThrownBy(() -> underTest.getWallpaper())
+            assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 400)
                     .hasFieldOrPropertyWithValue("description", "Bad Request")
@@ -303,33 +325,37 @@ class DigitalBlasphemyClientTest {
                             "\"filter_res_width\" must be greater than or equal to 1"
                     ));
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")));
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         @Test
         void getWallpaperCanMapUnknownErrorResponse() {
-            stubFor(get("/v2/core/wallpaper")
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
                     .withHeader("Authorization", equalTo("Bearer apiKey"))
                     .willReturn(aResponse().withStatus(405)));
 
-            assertThatThrownBy(() -> underTest.getWallpaper())
+            assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 0)
                     .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. []")
                     .extracting("errors").isNull();
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")));
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         @Test
         void getWallpaperCanMapNoResponse() {
-            assertThatThrownBy(() -> underTest.getWallpaper())
+            GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
+
+            assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 0)
                     .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. [No response could be served as there are no stub mappings in this WireMock instance.]")
                     .extracting("errors").isNull();
 
-            WireMock.verify(1, getRequestedFor(urlEqualTo("/v2/core/wallpaper")));
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
     }
 

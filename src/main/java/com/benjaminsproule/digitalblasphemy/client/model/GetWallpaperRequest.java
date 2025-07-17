@@ -33,6 +33,42 @@ public class GetWallpaperRequest {
         this.showResolutions = showResolutions;
     }
 
+    public int getWallpaperId() {
+        return this.wallpaperId;
+    }
+
+    public long getFilterResHeight() {
+        return this.filterResHeight;
+    }
+
+    public Operator getFilterResOperator() {
+        return this.filterResOperator;
+    }
+
+    public Operator getFilterResOperatorHeight() {
+        return this.filterResOperatorHeight;
+    }
+
+    public Operator getFilterResOperatorWidth() {
+        return this.filterResOperatorWidth;
+    }
+
+    public long getFilterResWidth() {
+        return this.filterResWidth;
+    }
+
+    public boolean isShowComments() {
+        return this.showComments;
+    }
+
+    public boolean isShowPickleJar() {
+        return this.showPickleJar;
+    }
+
+    public boolean isShowResolutions() {
+        return this.showResolutions;
+    }
+
     public static GetWallpaperRequest.Builder builder() {
         return new GetWallpaperRequest.Builder();
     }
@@ -48,6 +84,9 @@ public class GetWallpaperRequest {
         }
 
         public GetWallpaperRequest.Builder wallpaperId(int wallpaperId) {
+            if (wallpaperId <= 0) {
+                throw new IllegalArgumentException("Wallpaper ID must be greater than 0.");
+            }
             this.getWallPaperRequest.wallpaperId = wallpaperId;
             return this;
         }
@@ -93,6 +132,9 @@ public class GetWallpaperRequest {
         }
 
         public GetWallpaperRequest build() {
+            if (this.getWallPaperRequest.wallpaperId == 0) {
+                throw new IllegalStateException("Wallpaper ID must be provided.");
+            }
             return this.getWallPaperRequest;
         }
     }

@@ -3,6 +3,7 @@ package com.benjaminsproule.digitalblasphemy.client;
 import com.benjaminsproule.digitalblasphemy.client.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -27,7 +28,7 @@ public class DigitalBlasphemyClient {
     DigitalBlasphemyClient(String apiKey, String baseUrl) {
         this.apiKey = apiKey;
         this.accountInformationPath = baseUrl + "/v2/core/account";
-        this.wallpaperPath = baseUrl + "/v2/core/wallpaper";
+        this.wallpaperPath = baseUrl + "/v2/core/wallpaper/";
     }
 
     @NotNull
@@ -56,9 +57,9 @@ public class DigitalBlasphemyClient {
     }
 
     @Nullable
-    public Wallpaper getWallpaper(GetWallpaperRequest getWallpaperRequest) throws IOException, ResponseException {
+    public Wallpaper getWallpaper(@NotNull GetWallpaperRequest getWallpaperRequest) throws IOException, ResponseException {
         Request request = new Request.Builder()
-                .url(wallpaperPath)
+                .url(getWallpaperUrl(getWallpaperRequest))
                 .header("Authorization", "Bearer " + apiKey)
                 .get()
                 .build();
@@ -75,6 +76,28 @@ public class DigitalBlasphemyClient {
                 throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
             }
         }
+    }
+
+    @NotNull
+    private HttpUrl getWallpaperUrl(@NotNull GetWallpaperRequest getWallpaperRequest) {
+        HttpUrl.Builder builder = HttpUrl.parse(wallpaperPath)
+                .newBuilder()
+                .addEncodedPathSegment(String.valueOf(getWallpaperRequest.getWallpaperId()));
+
+        if (getWallpaperRequest.getFilterResHeight() > 0) {
+            builder.addQueryParameter("filter_res_height", String.valueOf(getWallpaperRequest.getFilterResHeight()));
+        }
+        builder.addQueryParameter("filter_res_operator", getWallpaperRequest.getFilterResOperator().toString());
+        builder.addQueryParameter("filter_res_operator_height", getWallpaperRequest.getFilterResOperatorHeight().toString());
+        builder.addQueryParameter("filter_res_operator_width", getWallpaperRequest.getFilterResOperatorWidth().toString());
+        if (getWallpaperRequest.getFilterResWidth() > 0) {
+            builder.addQueryParameter("filter_res_width", String.valueOf(getWallpaperRequest.getFilterResWidth()));
+        }
+        builder.addQueryParameter("show_comments", String.valueOf(getWallpaperRequest.isShowComments()));
+        builder.addQueryParameter("show_pickle_jar", String.valueOf(getWallpaperRequest.isShowPickleJar()));
+        builder.addQueryParameter("show_resolutions", String.valueOf(getWallpaperRequest.isShowResolutions()));
+
+        return builder.build();
     }
 
     public void downloadWallpaper() {
