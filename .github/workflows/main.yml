@@ -1,0 +1,107 @@
+name: 'Run main workflow'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "main"
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    if: github.ref_type != 'tags'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Run lint
+        run: cargo clippy --all-features --all-targets
+  build:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Run check
+        run: ./gradlew clean check
+  release-dry-run:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    needs:
+      - build
+    if: ${{ github.ref_type != 'tag' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Publish to maven local
+        run: ./gradlew publishToMavenLocal
+  release:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    needs:
+      - build
+    if: ${{ github.ref_type == 'tag' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      #      - name: Set version for release
+      #        run: |
+      #          cargo install cargo-edit --no-default-features --features "set-version"
+      #          cargo set-version ${{ github.ref_name }}
+      #      - name: Commit release version
+      #        run: |
+      #          git add Cargo.toml Cargo.lock
+      #          git commit -m "chore: set version to ${{ github.ref_name }}"
+      - name: Publish to maven repository
+        run: ./gradlew publish
+      #      - name: Set version for next release
+      #        id: next-release-version
+      #        run: |
+      #          NEXT_VERSION=$(echo ${{ github.ref_name }} | awk -F. -v OFS=. '{$NF += 1 ; print}')-alpha
+      #          cargo set-version "$NEXT_VERSION"
+      #          echo "next-version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
+      #      - name: Commit next release version
+      #        run: |
+      #          git add Cargo.toml Cargo.lock
+      #          git commit -m "chore: set version to ${{ steps.next-release-version.outputs.next-version }}"
+      #          git push origin HEAD:main
+      - name: Create Release
+        uses: ncipollo/release-action@v1.18.0
+        with:
+          artifacts: 'build/libs/digital-blasphemy-client*.jar'
+          generateReleaseNotes: true
+          makeLatest: true

@@ -57,7 +57,8 @@ public class DigitalBlasphemyClient {
     }
 
     @Nullable
-    public Wallpaper getWallpaper(@NotNull GetWallpaperRequest getWallpaperRequest) throws IOException, ResponseException {
+    public Wallpaper getWallpaper(@NotNull GetWallpaperRequest getWallpaperRequest)
+            throws IOException, ResponseException {
         Request request = new Request.Builder()
                 .url(getWallpaperUrl(getWallpaperRequest))
                 .header("Authorization", "Bearer " + apiKey)
@@ -85,17 +86,41 @@ public class DigitalBlasphemyClient {
                 .addEncodedPathSegment(String.valueOf(getWallpaperRequest.getWallpaperId()));
 
         if (getWallpaperRequest.getFilterResHeight() > 0) {
-            builder.addQueryParameter("filter_res_height", String.valueOf(getWallpaperRequest.getFilterResHeight()));
+            builder.addQueryParameter(
+                    "filter_res_height",
+                    String.valueOf(getWallpaperRequest.getFilterResHeight())
+            );
         }
-        builder.addQueryParameter("filter_res_operator", getWallpaperRequest.getFilterResOperator().toString());
-        builder.addQueryParameter("filter_res_operator_height", getWallpaperRequest.getFilterResOperatorHeight().toString());
-        builder.addQueryParameter("filter_res_operator_width", getWallpaperRequest.getFilterResOperatorWidth().toString());
+        builder.addQueryParameter(
+                "filter_res_operator",
+                getWallpaperRequest.getFilterResOperator().toString()
+        );
+        builder.addQueryParameter(
+                "filter_res_operator_height",
+                getWallpaperRequest.getFilterResOperatorHeight().toString()
+        );
+        builder.addQueryParameter(
+                "filter_res_operator_width",
+                getWallpaperRequest.getFilterResOperatorWidth().toString()
+        );
         if (getWallpaperRequest.getFilterResWidth() > 0) {
-            builder.addQueryParameter("filter_res_width", String.valueOf(getWallpaperRequest.getFilterResWidth()));
+            builder.addQueryParameter(
+                    "filter_res_width",
+                    String.valueOf(getWallpaperRequest.getFilterResWidth())
+            );
         }
-        builder.addQueryParameter("show_comments", String.valueOf(getWallpaperRequest.isShowComments()));
-        builder.addQueryParameter("show_pickle_jar", String.valueOf(getWallpaperRequest.isShowPickleJar()));
-        builder.addQueryParameter("show_resolutions", String.valueOf(getWallpaperRequest.isShowResolutions()));
+        builder.addQueryParameter(
+                "show_comments",
+                String.valueOf(getWallpaperRequest.isShowComments())
+        );
+        builder.addQueryParameter(
+                "show_pickle_jar",
+                String.valueOf(getWallpaperRequest.isShowPickleJar())
+        );
+        builder.addQueryParameter(
+                "show_resolutions",
+                String.valueOf(getWallpaperRequest.isShowResolutions())
+        );
 
         return builder.build();
     }

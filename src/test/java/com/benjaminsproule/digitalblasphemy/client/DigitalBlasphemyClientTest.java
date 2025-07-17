@@ -99,7 +99,9 @@ class DigitalBlasphemyClientTest {
             assertThatThrownBy(() -> underTest.getAccountInformation())
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. []")
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. []")
                     .extracting("errors").isNull();
 
             verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
@@ -110,7 +112,10 @@ class DigitalBlasphemyClientTest {
             assertThatThrownBy(() -> underTest.getAccountInformation())
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. [No response could be served as there are no stub mappings in this WireMock instance.]")
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. " +
+                                    "[No response could be served as there are no stub mappings in this WireMock instance.]")
                     .extracting("errors").isNull();
 
             verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
@@ -182,7 +187,8 @@ class DigitalBlasphemyClientTest {
 
         @ParameterizedTest
         @MethodSource("queryParamsProvided")
-        void getWallpaperDoesSendQueryParamIfProvided(String field, String queryParam, Object value, String expectedValue) throws IOException, URISyntaxException, ResponseException, IllegalAccessException, NoSuchFieldException {
+        void getWallpaperDoesSendQueryParamIfProvided(String field, String queryParam, Object value, String expectedValue)
+                throws IOException, URISyntaxException, ResponseException, IllegalAccessException, NoSuchFieldException {
             GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
 
             stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
@@ -234,7 +240,8 @@ class DigitalBlasphemyClientTest {
 
             assertThat(wallpaper).isEqualTo(expectedWallpaper);
 
-            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         public static Stream<Arguments> successfulResponse() throws IOException, URISyntaxException {
@@ -245,31 +252,80 @@ class DigitalBlasphemyClientTest {
                                     2,
                                     true,
                                     new Wallpaper.Comments(List.of(
-                                            new Wallpaper.Comments.Comment("5", "author ID 1", "author display 1", "Content 1", "6", 7),
-                                            new Wallpaper.Comments.Comment("8", "author ID 2", "author display 2", "Content 2", "9", 10)
+                                            new Wallpaper.Comments.Comment(
+                                                    "5",
+                                                    "author ID 1",
+                                                    "author display 1",
+                                                    "Content 1",
+                                                    "6",
+                                                    7),
+                                            new Wallpaper.Comments.Comment(
+                                                    "8",
+                                                    "author ID 2",
+                                                    "author display 2",
+                                                    "Content 2",
+                                                    "9",
+                                                    10)
                                     )),
                                     "Content 3",
                                     true,
                                     "Vulcan",
-                                    new Wallpaper.Paths("/wallpaper/2", "/thumbnail/12x13/vulcan_thumbnail_12x13.jpg", "/sec/vulcan/"),
-                                    new Wallpaper.PickleJar("parent 1", List.of("sibling 1", "sibling 2")),
+                                    new Wallpaper.Paths(
+                                            "/wallpaper/2",
+                                            "/thumbnail/12x13/vulcan_thumbnail_12x13.jpg",
+                                            "/sec/vulcan/"),
+                                    new Wallpaper.PickleJar(
+                                            "parent 1",
+                                            List.of("sibling 1", "sibling 2")),
                                     "11",
                                     new Wallpaper.Resolutions(
                                             List.of(
-                                                    new Wallpaper.Resolutions.Resolution("12x13", "12", "13", "/single/12x13/vulcan_single_12x13.jpg"),
-                                                    new Wallpaper.Resolutions.Resolution("14x15", "14", "15", "/single/14x15/vulcan_single_14x15.jpg")
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "12x13",
+                                                            "12",
+                                                            "13",
+                                                            "/single/12x13/vulcan_single_12x13.jpg"),
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "14x15",
+                                                            "14",
+                                                            "15",
+                                                            "/single/14x15/vulcan_single_14x15.jpg")
                                             ),
                                             List.of(
-                                                    new Wallpaper.Resolutions.Resolution("16x17", "16", "17", "/dual/16x17/vulcan_dual_16x17.jpg"),
-                                                    new Wallpaper.Resolutions.Resolution("18x19", "18", "19", "/dual/18x19/vulcan_dual_18x19.jpg")
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "16x17",
+                                                            "16",
+                                                            "17",
+                                                            "/dual/16x17/vulcan_dual_16x17.jpg"),
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "18x19",
+                                                            "18",
+                                                            "19",
+                                                            "/dual/18x19/vulcan_dual_18x19.jpg")
                                             ),
                                             List.of(
-                                                    new Wallpaper.Resolutions.Resolution("20x21", "20", "21", "/triple/20x21/vulcan_triple_20x21.jpg"),
-                                                    new Wallpaper.Resolutions.Resolution("22x23", "22", "23", "/triple/22x23/vulcan_triple_22x23.jpg")
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "20x21",
+                                                            "20",
+                                                            "21",
+                                                            "/triple/20x21/vulcan_triple_20x21.jpg"),
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "22x23",
+                                                            "22",
+                                                            "23",
+                                                            "/triple/22x23/vulcan_triple_22x23.jpg")
                                             ),
                                             List.of(
-                                                    new Wallpaper.Resolutions.Resolution("24x25", "24", "25", "/mobile/24x25/vulcan_mobile_24x25.jpg"),
-                                                    new Wallpaper.Resolutions.Resolution("26x27", "26", "27", "/mobile/26x27/vulcan_mobile_26x27.jpg")
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "24x25",
+                                                            "24",
+                                                            "25",
+                                                            "/mobile/24x25/vulcan_mobile_24x25.jpg"),
+                                                    new Wallpaper.Resolutions.Resolution(
+                                                            "26x27",
+                                                            "26",
+                                                            "27",
+                                                            "/mobile/26x27/vulcan_mobile_26x27.jpg")
                                             )
                                     ),
                                     "vulcan",
@@ -301,7 +357,8 @@ class DigitalBlasphemyClientTest {
                     .hasFieldOrPropertyWithValue("description", "Unauthorized")
                     .extracting("errors").isNull();
 
-            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         @Test
@@ -325,7 +382,8 @@ class DigitalBlasphemyClientTest {
                             "\"filter_res_width\" must be greater than or equal to 1"
                     ));
 
-            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         @Test
@@ -339,10 +397,13 @@ class DigitalBlasphemyClientTest {
             assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. []")
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. []")
                     .extracting("errors").isNull();
 
-            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
 
         @Test
@@ -352,10 +413,14 @@ class DigitalBlasphemyClientTest {
             assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
                     .isInstanceOf(ResponseException.class)
                     .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue("description", "Unable to parse the body as JSON ErrorResponse. [No response could be served as there are no stub mappings in this WireMock instance.]")
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. " +
+                                    "[No response could be served as there are no stub mappings in this WireMock instance.]")
                     .extracting("errors").isNull();
 
-            verify(1, getRequestedFor(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
     }
 

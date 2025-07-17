@@ -1,6 +1,8 @@
 plugins {
     `java-library`
     jacoco
+    checkstyle
+    `maven-publish`
 }
 
 repositories {
@@ -82,4 +84,32 @@ tasks.jacocoTestCoverageVerification {
 
 tasks.check {
     finalizedBy(tasks.jacocoTestCoverageVerification)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["java"])
+            pom {
+                name = "Digital Blasphemy Client"
+                description = "A client to interact with the Digital Blasphemy API"
+                url = "https://github.com/gigaSproule/digital-blasphemy-client-java/"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/gigaSproule/digital-blasphemy-client-java.git"
+                    developerConnection = "scm:git:ssh://github.com/gigaSproule/digital-blasphemy-client-java.git"
+                    url = "https://github.com/gigaSproule/digital-blasphemy-client-java/"
+                }
+            }
+        }
+    }
 }
