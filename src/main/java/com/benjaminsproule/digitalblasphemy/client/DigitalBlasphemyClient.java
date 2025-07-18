@@ -3,14 +3,16 @@ package com.benjaminsproule.digitalblasphemy.client;
 import com.benjaminsproule.digitalblasphemy.client.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+
+import static java.util.Objects.requireNonNull;
 
 public class DigitalBlasphemyClient {
 
@@ -31,7 +33,7 @@ public class DigitalBlasphemyClient {
         this.wallpaperPath = baseUrl + "/v2/core/wallpaper/";
     }
 
-    @NotNull
+    @NonNull
     public GetAccountInformationResponse getAccountInformation() throws IOException, ResponseException {
         Request request = new Request.Builder()
                 .url(accountInformationPath)
@@ -57,7 +59,7 @@ public class DigitalBlasphemyClient {
     }
 
     @Nullable
-    public Wallpaper getWallpaper(@NotNull GetWallpaperRequest getWallpaperRequest)
+    public Wallpaper getWallpaper(@NonNull GetWallpaperRequest getWallpaperRequest)
             throws IOException, ResponseException {
         Request request = new Request.Builder()
                 .url(getWallpaperUrl(getWallpaperRequest))
@@ -79,9 +81,9 @@ public class DigitalBlasphemyClient {
         }
     }
 
-    @NotNull
-    private HttpUrl getWallpaperUrl(@NotNull GetWallpaperRequest getWallpaperRequest) {
-        HttpUrl.Builder builder = HttpUrl.parse(wallpaperPath)
+    @NonNull
+    private HttpUrl getWallpaperUrl(@NonNull GetWallpaperRequest getWallpaperRequest) {
+        HttpUrl.Builder builder = requireNonNull(HttpUrl.parse(wallpaperPath))
                 .newBuilder()
                 .addEncodedPathSegment(String.valueOf(getWallpaperRequest.getWallpaperId()));
 

@@ -2,12 +2,12 @@ package com.benjaminsproule.digitalblasphemy.client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jetbrains.annotations.NotNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record GetAccountInformationResponse(
-        @NotNull @JsonProperty("db_core") DBCore dbCore,
-        @NotNull User user
+        @NonNull @JsonProperty("db_core") DBCore dbCore,
+        @NonNull User user
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DBCore(

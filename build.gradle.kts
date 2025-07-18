@@ -1,8 +1,11 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
 plugins {
     `java-library`
     jacoco
     checkstyle
     `maven-publish`
+    id("com.github.spotbugs") version "6.2.2"
 }
 
 repositories {
@@ -15,6 +18,7 @@ version = "0.1.0"
 dependencies {
     implementation(libs.okhttp)
     implementation(libs.jackson)
+    compileOnly(libs.spotbugs.annotations)
     testImplementation(libs.assertj)
     testImplementation(libs.wiremock)
 }
@@ -78,6 +82,19 @@ tasks.jacocoTestCoverageVerification {
                 counter = "CLASS"
                 minimum = "0.95".toBigDecimal()
             }
+        }
+    }
+}
+
+spotbugs {
+    excludeFilter = file("config/spotbugs/exclude.xml")
+}
+
+tasks.withType<SpotBugsTask> {
+    reports {
+        create("html") {
+            enabled = true
+            required = true
         }
     }
 }

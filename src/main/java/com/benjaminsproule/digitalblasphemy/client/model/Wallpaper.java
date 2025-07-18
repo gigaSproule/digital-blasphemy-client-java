@@ -1,7 +1,7 @@
 package com.benjaminsproule.digitalblasphemy.client.model;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -16,9 +16,9 @@ public record Wallpaper(
         String content,
         @Nullable
         Boolean free,
-        @NotNull
+        @NonNull
         String name,
-        @NotNull
+        @NonNull
         Paths paths,
         @Nullable
         PickleJar pickle_jar,
@@ -35,15 +35,15 @@ public record Wallpaper(
 
     public record Comments(List<Comment> comments) {
         public record Comment(
-                @NotNull
+                @NonNull
                 String id,
-                @NotNull
+                @NonNull
                 String author_id,
-                @NotNull
+                @NonNull
                 String author_display,
-                @NotNull
+                @NonNull
                 String content,
-                @NotNull
+                @NonNull
                 String rating,
                 long timestamp
         ) {
@@ -51,25 +51,25 @@ public record Wallpaper(
     }
 
     public record Paths(
-            @NotNull
+            @NonNull
             String api,
-            @NotNull
+            @NonNull
             String thumb,
-            @NotNull
+            @NonNull
             String web
     ) {
     }
 
     public record PickleJar(
-            @NotNull
+            @NonNull
             String parent,
-            @NotNull
+            @NonNull
             List<String> siblings
     ) {
     }
 
     public record Resolutions(
-            @NotNull
+            @NonNull
             List<Resolution> single,
             @Nullable
             List<Resolution> dual,
@@ -79,13 +79,13 @@ public record Wallpaper(
             List<Resolution> mobile
     ) {
         public record Resolution(
-                @NotNull
+                @NonNull
                 String label,
-                @NotNull
+                @NonNull
                 String width,
-                @NotNull
+                @NonNull
                 String height,
-                @NotNull
+                @NonNull
                 String image
         ) {
         }
@@ -93,7 +93,7 @@ public record Wallpaper(
 
     public record Tag(
             long id,
-            @NotNull
+            @NonNull
             String name
     ) {
     }
