@@ -86,6 +86,11 @@ tasks.jacocoTestCoverageVerification {
     }
 }
 
+checkstyle {
+    config =
+        project.resources.text.fromUri("https://raw.githubusercontent.com/gigaSproule/checkstyle-config/refs/heads/main/checkstyle.xml")
+}
+
 spotbugs {
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
