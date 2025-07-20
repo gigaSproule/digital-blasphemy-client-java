@@ -16,12 +16,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.benjaminsproule.digitalblasphemy.client.util.FileUtils.readFile;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -124,6 +126,244 @@ class DigitalBlasphemyClientTest {
 
     @Nested
     class GetWallpapers {
+        @ParameterizedTest
+        @MethodSource("notSentQueryParamsWhenNotProvided")
+        void getWallpapersDoesNotSendQueryParamIfNotProvided(String queryParam) throws IOException, URISyntaxException, ResponseException {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("getWallpapersSuccessFullyPopulated.json")
+                            ))));
+
+            underTest.getWallpapers(getWallpapersRequest);
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withoutQueryParam(queryParam));
+        }
+
+        public static Stream<Arguments> notSentQueryParamsWhenNotProvided() {
+            return Stream.of(
+                    arguments("filter_date_day"),
+                    arguments("filter_date_month"),
+                    arguments("filter_date_year"),
+                    arguments("filter_date_gallery"),
+                    arguments("filter_rating"),
+                    arguments("filter_res_height"),
+                    arguments("filter_tag"),
+                    arguments("order_by"),
+                    arguments("s")
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("sentQueryParamsWhenNotProvided")
+        void getWallpapersDoesSendQueryParamIfNotProvided(String queryParam, String expectedValue) throws IOException, URISyntaxException, ResponseException {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("getWallpapersSuccessFullyPopulated.json")
+                            ))));
+
+            underTest.getWallpapers(getWallpapersRequest);
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpapers\\?.*" + queryParam + "=" + expectedValue + ".*"))
+            );
+        }
+
+        public static Stream<Arguments> sentQueryParamsWhenNotProvided() {
+            return Stream.of(
+                    arguments("filter_date_operator", "%3E%3D"),
+                    arguments("filter_rating_operator", "%3E%3D"),
+                    arguments("filter_res_operator", "%3E%3D"),
+                    arguments("filter_res_operator_height", "%3E%3D"),
+                    arguments("filter_res_operator_width", "%3E%3D"),
+                    arguments("limit", "10"),
+                    arguments("page", "1"),
+                    arguments("show_comments", "false"),
+                    arguments("show_pickle_jar", "false"),
+                    arguments("show_resolutions", "true")
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("queryParamsProvided")
+        void getWallpaperDoesSendQueryParamIfProvided(String field, String queryParam, Object value, String expectedValue)
+                throws IOException, URISyntaxException, ResponseException, IllegalAccessException, NoSuchFieldException {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("getWallpapersSuccessFullyPopulated.json")
+                            ))));
+
+            Field declaredField = GetWallpapersRequest.class.getDeclaredField(field);
+            declaredField.setAccessible(true);
+            declaredField.set(getWallpapersRequest, value);
+            declaredField.setAccessible(false);
+
+            underTest.getWallpapers(getWallpapersRequest);
+
+            if (value instanceof List<?>) {
+                String[] expectedValues = expectedValue.split(",");
+                String expectedQueryParams = Arrays.stream(expectedValues).map((expected) -> queryParam + "=" + expected).collect(joining("&"));
+                verify(1, getRequestedFor(
+                        urlMatching("/v2/core/wallpapers\\?.*" + expectedQueryParams + ".*"))
+                );
+            } else {
+                verify(1, getRequestedFor(
+                        urlMatching("/v2/core/wallpapers\\?.*" + queryParam + "=" + expectedValue + ".*"))
+                );
+            }
+        }
+
+        public static Stream<Arguments> queryParamsProvided() {
+            return Stream.of(
+                    arguments("filterDateDay", "filter_date_day", 2, "2"),
+                    arguments("filterDateMonth", "filter_date_month", 2, "2"),
+                    arguments("filterDateYear", "filter_date_year", 2000, "2000"),
+                    arguments("filterDateOperator", "filter_date_operator", Operator.Equal, "%3D"),
+                    arguments("filterGallery", "filter_gallery", List.of(1, 2), "1,2"),
+                    arguments("filterRating", "filter_rating", 3f, "3"),
+                    arguments("filterRatingOperator", "filter_rating_operator", Operator.Equal, "%3D"),
+                    arguments("filterResHeight", "filter_res_height", 1080, "1080"),
+                    arguments("filterResOperator", "filter_res_operator", Operator.Equal, "%3D"),
+                    arguments("filterResOperatorHeight", "filter_res_operator_height", Operator.Equal, "%3D"),
+                    arguments("filterResOperatorWidth", "filter_res_operator_width", Operator.Equal, "%3D"),
+                    arguments("filterResWidth", "filter_res_width", 1920, "1920"),
+                    arguments("filterTag", "filter_tag", List.of(1, 2), "1,2"),
+                    arguments("limit", "limit", 20, "20"),
+                    arguments("order", "order", Order.DESCENDING, "desc"),
+                    arguments("orderBy", "order_by", GetWallpapersOrderBy.NAME, "name"),
+                    arguments("page", "page", 2, "2"),
+                    arguments("s", "s", "search", "search"),
+                    arguments("showComments", "show_comments", true, "true"),
+                    arguments("showPickleJar", "show_pickle_jar", true, "true"),
+                    arguments("showResolutions", "show_resolutions", false, "false")
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("successfulResponse")
+        void getWallpapersCanMapResponse(String response, GetWallpapersResponse expectedWallpapersResponse) throws IOException, ResponseException {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(response))
+                    ));
+
+            GetWallpapersResponse getWallpapersResponse = underTest.getWallpapers(getWallpapersRequest);
+
+            assertThat(getWallpapersResponse).isEqualTo(expectedWallpapersResponse);
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpapers\\?.*")));
+        }
+
+        public static Stream<Arguments> successfulResponse() throws IOException, URISyntaxException {
+            return Stream.of(
+                    arguments(readFile("getWallpaperSuccessFullyPopulated.json"), new GetWallpapersResponse()),
+                    arguments(readFile("getWallpapersSuccessMinimalPopulated.json"), new GetWallpapersResponse())
+            );
+        }
+
+        @Test
+        void getWallpaperCanMapUnauthorisedResponse() throws IOException, URISyntaxException {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(unauthorized()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("unauthorisedResponse.json")
+                            ))));
+
+            assertThatThrownBy(() -> underTest.getWallpapers(getWallpapersRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 401)
+                    .hasFieldOrPropertyWithValue("description", "Unauthorized")
+                    .extracting("errors").isNull();
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpapers\\?.*")));
+        }
+
+        @Test
+        void getWallpaperCanMapBadRequestResponse() throws IOException, URISyntaxException {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(badRequest()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("getWallpapersBadRequest.json")
+                            ))));
+
+            assertThatThrownBy(() -> underTest.getWallpapers(getWallpapersRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 400)
+                    .hasFieldOrPropertyWithValue("description", "Bad Request")
+                    .hasFieldOrPropertyWithValue("errors", List.of(
+                            "\"filter_date_day\" must be less than or equal to 31",
+                            "\"limit\" must be greater than or equal to 1"
+                    ));
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpapers\\?.*")));
+        }
+
+        @Test
+        void getWallpaperCanMapUnknownErrorResponse() {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withStatus(405)));
+
+            assertThatThrownBy(() -> underTest.getWallpapers(getWallpapersRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 0)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. []")
+                    .extracting("errors").isNull();
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpapers\\?.*")));
+        }
+
+        @Test
+        void getWallpaperCanMapNoResponse() {
+            GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
+
+            assertThatThrownBy(() -> underTest.getWallpapers(getWallpapersRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 0)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. " +
+                                    "[No response could be served as there are no stub mappings in this WireMock instance.]")
+                    .extracting("errors").isNull();
+
+            verify(1, getRequestedFor(
+                    urlMatching("/v2/core/wallpapers\\?.*")));
+        }
     }
 
     @Nested

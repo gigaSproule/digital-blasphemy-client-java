@@ -20,4 +20,8 @@ public class ResponseException extends Exception {
         this.description = description;
         this.errors = errors;
     }
+
+    public String toString() {
+        return "Code: %d, Description: %s, Errors: %s".formatted(code, description, errors);
+    }
 }

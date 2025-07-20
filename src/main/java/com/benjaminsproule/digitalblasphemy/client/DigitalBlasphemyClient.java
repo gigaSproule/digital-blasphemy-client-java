@@ -21,6 +21,7 @@ public class DigitalBlasphemyClient {
 
     private final String apiKey;
     private final String accountInformationPath;
+    private final String wallpapersPath;
     private final String wallpaperPath;
 
     public DigitalBlasphemyClient(String apiKey) {
@@ -30,6 +31,7 @@ public class DigitalBlasphemyClient {
     DigitalBlasphemyClient(String apiKey, String baseUrl) {
         this.apiKey = apiKey;
         this.accountInformationPath = baseUrl + "/v2/core/account";
+        this.wallpapersPath = baseUrl + "/v2/core/wallpapers";
         this.wallpaperPath = baseUrl + "/v2/core/wallpaper/";
     }
 
@@ -54,8 +56,71 @@ public class DigitalBlasphemyClient {
         }
     }
 
-    public GetWallpapersResponse getWallpapers() {
-        return null;
+    public GetWallpapersResponse getWallpapers(GetWallpapersRequest getWallpapersRequest) throws IOException, ResponseException {
+        Request request = new Request.Builder()
+                .url(getWallpapersUrl(getWallpapersRequest))
+                .header("Authorization", "Bearer " + apiKey)
+                .get()
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            if (response.isSuccessful()) {
+                return objectMapper.readValue(body, GetWallpapersResponse.class);
+            }
+            try {
+                ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
+                throw new ResponseException(responseError);
+            } catch (JsonProcessingException exception) {
+                throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
+            }
+        }
+    }
+
+    @NonNull
+    private HttpUrl getWallpapersUrl(@NonNull GetWallpapersRequest getWallpapersRequest) {
+        HttpUrl.Builder builder = requireNonNull(HttpUrl.parse(wallpapersPath))
+                .newBuilder();
+
+        if (getWallpapersRequest.getFilterDateDay() != 0) {
+            builder.addQueryParameter("filter_date_day", String.valueOf(getWallpapersRequest.getFilterDateDay()));
+        }
+        if (getWallpapersRequest.getFilterDateMonth() != 0) {
+            builder.addQueryParameter("filter_date_month", String.valueOf(getWallpapersRequest.getFilterDateMonth()));
+
+        }
+        if (getWallpapersRequest.getFilterDateYear() != 0) {
+            builder.addQueryParameter("filter_date_year", String.valueOf(getWallpapersRequest.getFilterDateYear()));
+        }
+        builder.addQueryParameter("filter_date_operator", getWallpapersRequest.getFilterDateOperator().toString());
+        getWallpapersRequest.getFilterGallery().forEach(gallery -> builder.addQueryParameter("filter_gallery", gallery.toString()));
+        if (getWallpapersRequest.getFilterRating() != 0) {
+            builder.addQueryParameter("filter_rating", String.valueOf(getWallpapersRequest.getFilterRating()));
+        }
+        builder.addQueryParameter("filter_rating_operator", getWallpapersRequest.getFilterRatingOperator().toString());
+        if (getWallpapersRequest.getFilterResHeight() != 0) {
+            builder.addQueryParameter("filter_res_height", String.valueOf(getWallpapersRequest.getFilterResHeight()));
+        }
+        builder.addQueryParameter("filter_res_operator", getWallpapersRequest.getFilterResOperator().toString());
+        builder.addQueryParameter("filter_res_operator_height", getWallpapersRequest.getFilterResOperatorHeight().toString());
+        builder.addQueryParameter("filter_res_operator_width", getWallpapersRequest.getFilterResOperatorWidth().toString());
+        if (getWallpapersRequest.getFilterResWidth() != 0) {
+            builder.addQueryParameter("filter_res_width", String.valueOf(getWallpapersRequest.getFilterResWidth()));
+        }
+        getWallpapersRequest.getFilterTag().forEach(tag -> builder.addQueryParameter("filter_tag", tag.toString()));
+        builder.addQueryParameter("limit", String.valueOf(getWallpapersRequest.getLimit()));
+        builder.addQueryParameter("order", getWallpapersRequest.getOrder().toString());
+        if (!getWallpapersRequest.getOrderBy().equals(GetWallpapersOrderBy.DATE)) {
+            builder.addQueryParameter("order_by", getWallpapersRequest.getOrderBy().toString());
+        }
+        builder.addQueryParameter("page", String.valueOf(getWallpapersRequest.getPage()));
+        if (!getWallpapersRequest.getS().isEmpty()) {
+            builder.addQueryParameter("s", getWallpapersRequest.getS());
+        }
+        builder.addQueryParameter("show_comments", String.valueOf(getWallpapersRequest.isShowComments()));
+        builder.addQueryParameter("show_pickle_jar", String.valueOf(getWallpapersRequest.isShowPickleJar()));
+        builder.addQueryParameter("show_resolutions", String.valueOf(getWallpapersRequest.isShowResolutions()));
+
+        return builder.build();
     }
 
     @Nullable
