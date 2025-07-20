@@ -56,7 +56,7 @@ public class DigitalBlasphemyClient {
         }
     }
 
-    public GetWallpapersResponse getWallpapers(GetWallpapersRequest getWallpapersRequest) throws IOException, ResponseException {
+    public GetWallpapersResponse getWallpapers(@NonNull GetWallpapersRequest getWallpapersRequest) throws IOException, ResponseException {
         Request request = new Request.Builder()
                 .url(getWallpapersUrl(getWallpapersRequest))
                 .header("Authorization", "Bearer " + apiKey)

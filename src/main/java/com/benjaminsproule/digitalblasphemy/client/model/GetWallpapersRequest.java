@@ -1,5 +1,7 @@
 package com.benjaminsproule.digitalblasphemy.client.model;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -27,7 +29,13 @@ public class GetWallpapersRequest {
     private boolean showPickleJar;
     private boolean showResolutions;
 
-    public GetWallpapersRequest(int filterDateDay, int filterDateMonth, int filterDateYear, Operator filterDateOperator, List<Integer> filterGallery, float filterRating, Operator filterRatingOperator, long filterResHeight, Operator filterResOperator, Operator filterResOperatorHeight, Operator filterResOperatorWidth, long filterResWidth, List<Integer> filterTag, int limit, Order order, GetWallpapersOrderBy orderBy, int page, String s, boolean showComments, boolean showPickleJar, boolean showResolutions) {
+    public GetWallpapersRequest(int filterDateDay, int filterDateMonth, int filterDateYear,
+                                Operator filterDateOperator, List<Integer> filterGallery, float filterRating,
+                                Operator filterRatingOperator, long filterResHeight, Operator filterResOperator,
+                                Operator filterResOperatorHeight, Operator filterResOperatorWidth, long filterResWidth,
+                                List<Integer> filterTag, int limit, Order order, GetWallpapersOrderBy orderBy,
+                                int page, String s, boolean showComments, boolean showPickleJar,
+                                boolean showResolutions) {
         this.filterDateDay = filterDateDay;
         this.filterDateMonth = filterDateMonth;
         this.filterDateYear = filterDateYear;
@@ -152,92 +160,134 @@ public class GetWallpapersRequest {
             );
         }
 
-        public int filterDateDay(int filterDateDay) {
-            return getWallPapersRequest.filterDateDay = filterDateDay;
+        public GetWallpapersRequest.Builder filterDateDay(int filterDateDay) {
+            if (filterDateDay < 1 || filterDateDay > 31) {
+                throw new IllegalArgumentException("Filter date day must be between 1 and 31.");
+            }
+            this.getWallPapersRequest.filterDateDay = filterDateDay;
+            return this;
         }
 
-        public int filterDateMonth(int filterDateMont) {
-            return getWallPapersRequest.filterDateMonth = filterDateMont;
+        public GetWallpapersRequest.Builder filterDateMonth(int filterDateMonth) {
+            if (filterDateMonth < 1 || filterDateMonth > 12) {
+                throw new IllegalArgumentException("Filter date month must be between 1 and 12.");
+            }
+            this.getWallPapersRequest.filterDateMonth = filterDateMonth;
+            return this;
         }
 
-        public int filterDateYear(int filterDateYear) {
-            return getWallPapersRequest.filterDateYear = filterDateYear;
+        public GetWallpapersRequest.Builder filterDateYear(int filterDateYear) {
+            if (filterDateYear < 1997) {
+                throw new IllegalArgumentException("Filter date year must be from 1997 inclusive.");
+            }
+            this.getWallPapersRequest.filterDateYear = filterDateYear;
+            return this;
         }
 
-        public Operator filterDateOperator(Operator filterDateOperator) {
-            return getWallPapersRequest.filterDateOperator = filterDateOperator;
+        public GetWallpapersRequest.Builder filterDateOperator(@NonNull Operator filterDateOperator) {
+            this.getWallPapersRequest.filterDateOperator = filterDateOperator;
+            return this;
         }
 
-        public List<Integer> filterGallery(List<Integer> filterGallery) {
-            return getWallPapersRequest.filterGallery = filterGallery;
+        public GetWallpapersRequest.Builder filterGallery(@NonNull List<Integer> filterGallery) {
+            this.getWallPapersRequest.filterGallery = filterGallery;
+            return this;
         }
 
-        public float filterRating(float filterRating) {
-            return getWallPapersRequest.filterRating = filterRating;
+        public GetWallpapersRequest.Builder filterRating(float filterRating) {
+            if (filterRating < 1 || filterRating > 5) {
+                throw new IllegalArgumentException("Filter rating must be between 1 and 5.");
+            }
+            this.getWallPapersRequest.filterRating = filterRating;
+            return this;
         }
 
-        public Operator filterRatingOperator(Operator filterRatingOperator) {
-            return getWallPapersRequest.filterRatingOperator = filterRatingOperator;
+        public GetWallpapersRequest.Builder filterRatingOperator(@NonNull Operator filterRatingOperator) {
+            this.getWallPapersRequest.filterRatingOperator = filterRatingOperator;
+            return this;
         }
 
-        public long filterResHeight(long filterResHeight) {
-            return getWallPapersRequest.filterResHeight = filterResHeight;
+        public GetWallpapersRequest.Builder filterResHeight(long filterResHeight) {
+            this.getWallPapersRequest.filterResHeight = filterResHeight;
+            return this;
         }
 
-        public Operator filterResOperator(Operator filterResOperator) {
-            return getWallPapersRequest.filterResOperator = filterResOperator;
+        public GetWallpapersRequest.Builder filterResOperator(@NonNull Operator filterResOperator) {
+            this.getWallPapersRequest.filterResOperator = filterResOperator;
+            return this;
         }
 
-        public Operator filterResOperatorHeight(Operator filterResOperatorHeight) {
-            return getWallPapersRequest.filterResOperatorHeight = filterResOperatorHeight;
+        public GetWallpapersRequest.Builder filterResOperatorHeight(@NonNull Operator filterResOperatorHeight) {
+            this.getWallPapersRequest.filterResOperatorHeight = filterResOperatorHeight;
+            return this;
         }
 
-        public Operator filterResOperatorWidth(Operator filterResOperatorWidth) {
-            return getWallPapersRequest.filterResOperatorWidth = filterResOperatorWidth;
+        public GetWallpapersRequest.Builder filterResOperatorWidth(@NonNull Operator filterResOperatorWidth) {
+            this.getWallPapersRequest.filterResOperatorWidth = filterResOperatorWidth;
+            return this;
         }
 
-        public long filterResWidth(long filterResWidth) {
-            return getWallPapersRequest.filterResWidth = filterResWidth;
+        public GetWallpapersRequest.Builder filterResWidth(long filterResWidth) {
+            this.getWallPapersRequest.filterResWidth = filterResWidth;
+            return this;
         }
 
-        public List<Integer> filterTag(List<Integer> filterTag) {
-            return getWallPapersRequest.filterTag = filterTag;
+        public GetWallpapersRequest.Builder filterTag(@NonNull List<Integer> filterTag) {
+            this.getWallPapersRequest.filterTag = filterTag;
+            return this;
         }
 
-        public int limit(int limit) {
-            return getWallPapersRequest.limit = limit;
+        public GetWallpapersRequest.Builder limit(int limit) {
+            if (limit < 1 || limit > 50) {
+                throw new IllegalArgumentException("Limit must be between 1 and 50.");
+            }
+            this.getWallPapersRequest.limit = limit;
+            return this;
         }
 
-        public Order order(Order order) {
-            return getWallPapersRequest.order = order;
+        public GetWallpapersRequest.Builder order(@NonNull Order order) {
+            this.getWallPapersRequest.order = order;
+            return this;
         }
 
-        public GetWallpapersOrderBy orderBy(GetWallpapersOrderBy orderBy) {
-            return getWallPapersRequest.orderBy = orderBy;
+        public GetWallpapersRequest.Builder orderBy(@NonNull GetWallpapersOrderBy orderBy) {
+            this.getWallPapersRequest.orderBy = orderBy;
+            return this;
         }
 
-        public int page(int page) {
-            return getWallPapersRequest.page = page;
+        public GetWallpapersRequest.Builder page(int page) {
+            if (page < 1) {
+                throw new IllegalArgumentException("Page must be greater than 0.");
+            }
+            this.getWallPapersRequest.page = page;
+            return this;
         }
 
-        public String s(String s) {
-            return getWallPapersRequest.s = s;
+        public GetWallpapersRequest.Builder s(@NonNull String s) {
+            if (s.isBlank()) {
+                throw new IllegalArgumentException("S must not be an empty or blank string.");
+            }
+            this.getWallPapersRequest.s = s;
+            return this;
         }
 
-        public boolean showComments(boolean showComments) {
-            return getWallPapersRequest.showComments = showComments;
+        public GetWallpapersRequest.Builder showComments(boolean showComments) {
+            this.getWallPapersRequest.showComments = showComments;
+            return this;
         }
 
-        public boolean showPickleJar(boolean showPickleJar) {
-            return getWallPapersRequest.showPickleJar = showPickleJar;
+        public GetWallpapersRequest.Builder showPickleJar(boolean showPickleJar) {
+            this.getWallPapersRequest.showPickleJar = showPickleJar;
+            return this;
         }
 
-        public boolean showResolutions(boolean showResolutions) {
-            return getWallPapersRequest.showResolutions = showResolutions;
+        public GetWallpapersRequest.Builder showResolutions(boolean showResolutions) {
+            this.getWallPapersRequest.showResolutions = showResolutions;
+            return this;
         }
 
         public GetWallpapersRequest build() {
-            return getWallPapersRequest;
+            return this.getWallPapersRequest;
         }
     }
 }
