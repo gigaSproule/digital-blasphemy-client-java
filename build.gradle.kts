@@ -4,7 +4,7 @@ plugins {
     `java-library`
     jacoco
     checkstyle
-    `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.34.0"
     id("com.github.spotbugs") version "6.2.2"
     id("info.solidsoft.pitest") version "1.19.0-rc.1"
 }
@@ -14,7 +14,7 @@ repositories {
 }
 
 group = "com.benjaminsproule"
-version = "0.1.0"
+version = rootProject.file("version.txt").readText().trim()
 
 dependencies {
     compileOnly(libs.spotbugs.annotations)
@@ -116,30 +116,25 @@ tasks.check {
     finalizedBy(tasks.jacocoTestCoverageVerification, tasks.pitest)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-
-            from(components["java"])
-            pom {
-                name = "Digital Blasphemy Client"
-                description = "A client to interact with the Digital Blasphemy API"
-                url = "https://github.com/gigaSproule/digital-blasphemy-client-java/"
-                licenses {
-                    license {
-                        name = "The Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-                scm {
-                    connection = "scm:git:git://github.com/gigaSproule/digital-blasphemy-client-java.git"
-                    developerConnection = "scm:git:ssh://github.com/gigaSproule/digital-blasphemy-client-java.git"
-                    url = "https://github.com/gigaSproule/digital-blasphemy-client-java/"
-                }
+mavenPublishing {
+    coordinates("${project.group}", project.name, project.version.toString())
+    publishToMavenCentral()
+    signAllPublications()
+    pom {
+        name = "Digital Blasphemy Client"
+        description = "A client to interact with the Digital Blasphemy API"
+        inceptionYear = "2025"
+        url = "https://github.com/gigaSproule/digital-blasphemy-client-java/"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
+        }
+        scm {
+            connection = "scm:git:git://github.com/gigaSproule/digital-blasphemy-client-java.git"
+            developerConnection = "scm:git:ssh://github.com/gigaSproule/digital-blasphemy-client-java.git"
+            url = "https://github.com/gigaSproule/digital-blasphemy-client-java/"
         }
     }
 }
