@@ -6,6 +6,7 @@ plugins {
     checkstyle
     `maven-publish`
     id("com.github.spotbugs") version "6.2.2"
+    id("info.solidsoft.pitest") version "1.19.0-rc.1"
 }
 
 repositories {
@@ -51,13 +52,13 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "INSTRUCTION"
-                minimum = "0.99".toBigDecimal()
+                minimum = "1.00".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.99".toBigDecimal()
+                minimum = "1.00".toBigDecimal()
             }
         }
         rule {
@@ -69,13 +70,13 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "COMPLEXITY"
-                minimum = "0.99".toBigDecimal()
+                minimum = "1.00".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "METHOD"
-                minimum = "0.99".toBigDecimal()
+                minimum = "1.00".toBigDecimal()
             }
         }
         rule {
@@ -94,7 +95,6 @@ checkstyle {
 
 spotbugs {
     excludeFilter = file("config/spotbugs/exclude.xml")
-//    excludeBugsFile = file("config/spotbugs/exclude.xml")
 }
 
 tasks.withType<SpotBugsTask> {
@@ -106,8 +106,14 @@ tasks.withType<SpotBugsTask> {
     }
 }
 
+pitest {
+    junit5PluginVersion = "1.2.3"
+    mutationThreshold = 100
+    coverageThreshold = 100
+}
+
 tasks.check {
-    finalizedBy(tasks.jacocoTestCoverageVerification)
+    finalizedBy(tasks.jacocoTestCoverageVerification, tasks.pitest)
 }
 
 publishing {

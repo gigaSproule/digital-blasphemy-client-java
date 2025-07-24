@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.http.Body;
+import com.github.tomakehurst.wiremock.http.Fault;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -51,6 +52,23 @@ class DigitalBlasphemyClientTest {
         if (wireMockServer != null) {
             wireMockServer.stop();
         }
+    }
+
+    @Test
+    void usesDigitalBlasphemyApiHost() throws NoSuchFieldException, IllegalAccessException {
+        DigitalBlasphemyClient digitalBlasphemyClient = new DigitalBlasphemyClient("apiKey");
+        assertThat(getField(digitalBlasphemyClient, "accountInformationPath")).isEqualTo("https://api.digitalblasphemy.com/v2/core/account");
+        assertThat(getField(digitalBlasphemyClient, "wallpapersPath")).isEqualTo("https://api.digitalblasphemy.com/v2/core/wallpapers");
+        assertThat(getField(digitalBlasphemyClient, "wallpaperPath")).isEqualTo("https://api.digitalblasphemy.com/v2/core/wallpaper/");
+        assertThat(getField(digitalBlasphemyClient, "downloadWallpaperPath")).isEqualTo("https://api.digitalblasphemy.com/v2/core/download/wallpaper/");
+    }
+
+    private static Object getField(DigitalBlasphemyClient digitalBlasphemyClient, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = DigitalBlasphemyClient.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        Object fieldValue = field.get(digitalBlasphemyClient);
+        field.setAccessible(false);
+        return fieldValue;
     }
 
     @Nested
@@ -114,16 +132,15 @@ class DigitalBlasphemyClientTest {
 
         @Test
         void getAccountInformationCanMapNoResponse() {
-            assertThatThrownBy(() -> underTest.getAccountInformation())
-                    .isInstanceOf(ResponseException.class)
-                    .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue(
-                            "description",
-                            "Unable to parse the body as JSON ErrorResponse. " +
-                                    "[No response could be served as there are no stub mappings in this WireMock instance.]")
-                    .extracting("errors").isNull();
+            stubFor(get("/v2/core/account")
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE)));
 
-            verify(1, getRequestedFor(urlEqualTo("/v2/core/account")));
+            assertThatThrownBy(() -> underTest.getAccountInformation())
+                    .isInstanceOf(IOException.class)
+                    .hasMessageStartingWith("unexpected end of stream on %s".formatted(wireMockServer.baseUrl()));
+
+            verify(moreThanOrExactly(2), getRequestedFor(urlEqualTo("/v2/core/account")));
         }
     }
 
@@ -355,16 +372,15 @@ class DigitalBlasphemyClientTest {
         void getWallpaperCanMapNoResponse() {
             GetWallpapersRequest getWallpapersRequest = GetWallpapersRequest.builder().build();
 
-            assertThatThrownBy(() -> underTest.getWallpapers(getWallpapersRequest))
-                    .isInstanceOf(ResponseException.class)
-                    .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue(
-                            "description",
-                            "Unable to parse the body as JSON ErrorResponse. " +
-                                    "[No response could be served as there are no stub mappings in this WireMock instance.]")
-                    .extracting("errors").isNull();
+            stubFor(get(urlMatching("/v2/core/wallpapers\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE)));
 
-            verify(1, getRequestedFor(
+            assertThatThrownBy(() -> underTest.getWallpapers(getWallpapersRequest))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageStartingWith("unexpected end of stream on %s".formatted(wireMockServer.baseUrl()));
+
+            verify(moreThanOrExactly(2), getRequestedFor(
                     urlMatching("/v2/core/wallpapers\\?.*")));
         }
     }
@@ -653,16 +669,15 @@ class DigitalBlasphemyClientTest {
         void getWallpaperCanMapNoResponse() {
             GetWallpaperRequest getWallpaperRequest = GetWallpaperRequest.builder().wallpaperId(1).build();
 
-            assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
-                    .isInstanceOf(ResponseException.class)
-                    .hasFieldOrPropertyWithValue("code", 0)
-                    .hasFieldOrPropertyWithValue(
-                            "description",
-                            "Unable to parse the body as JSON ErrorResponse. " +
-                                    "[No response could be served as there are no stub mappings in this WireMock instance.]")
-                    .extracting("errors").isNull();
+            stubFor(get(urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE)));
 
-            verify(1, getRequestedFor(
+            assertThatThrownBy(() -> underTest.getWallpaper(getWallpaperRequest))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageStartingWith("unexpected end of stream on %s".formatted(wireMockServer.baseUrl()));
+
+            verify(moreThanOrExactly(2), getRequestedFor(
                     urlMatching("/v2/core/wallpaper/" + getWallpaperRequest.getWallpaperId() + "\\?.*")));
         }
     }
@@ -899,7 +914,7 @@ class DigitalBlasphemyClientTest {
         }
 
         @Test
-        void downloadWallpaperCanMapUnauthorisedResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException, ResponseException {
+        void downloadWallpaperCanMapUnauthorisedResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
                     .type(WallpaperType.Dual)
                     .width(2)
@@ -943,7 +958,7 @@ class DigitalBlasphemyClientTest {
         }
 
         @Test
-        void downloadWallpaperCanMapUnauthorisedResponseWhenDownloadingFile() throws IOException, URISyntaxException, ResponseException {
+        void downloadWallpaperCanMapUnauthorisedResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
                     .type(WallpaperType.Dual)
                     .width(2)
@@ -997,7 +1012,7 @@ class DigitalBlasphemyClientTest {
         }
 
         @Test
-        void downloadWallpaperCanMapBadRequestResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException, ResponseException {
+        void downloadWallpaperCanMapBadRequestResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
                     .type(WallpaperType.Dual)
                     .width(2)
@@ -1044,7 +1059,7 @@ class DigitalBlasphemyClientTest {
         }
 
         @Test
-        void downloadWallpaperCanMapNotFoundResponseWhenDownloadingFile() throws IOException, URISyntaxException, ResponseException {
+        void downloadWallpaperCanMapNotFoundResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
                     .type(WallpaperType.Dual)
                     .width(2)
@@ -1097,7 +1112,7 @@ class DigitalBlasphemyClientTest {
         }
 
         @Test
-        void downloadWallpaperCanMapUnknownErrorResponseWhenDownloadingFile() throws IOException, URISyntaxException, ResponseException {
+        void downloadWallpaperCanMapUnknownErrorResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
                     .type(WallpaperType.Dual)
                     .width(2)
@@ -1143,6 +1158,89 @@ class DigitalBlasphemyClientTest {
                     downloadWallpaperRequest.getWallpaperId()
             ))));
             verify(1, getRequestedFor(urlMatching("/test.jpg")));
+        }
+
+        @Test
+        void downloadWallpaperNoResponseWhenGettingDownloadWallpaperResponse() {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE)));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageStartingWith("unexpected end of stream on %s".formatted(wireMockServer.baseUrl()));
+            ;
+
+            assertThat(Files.notExists(Path.of(filename))).isTrue();
+            verify(moreThanOrExactly(2), getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(0, getRequestedFor(urlMatching("/test.jpg")));
+        }
+
+        @Test
+        void downloadWallpaperNoResponseWhenDownloadingFile() throws IOException, URISyntaxException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE)));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageStartingWith("unexpected end of stream on %s".formatted(wireMockServer.baseUrl()));
+            ;
+
+            assertThat(Files.notExists(Path.of(filename))).isTrue();
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(moreThanOrExactly(2), getRequestedFor(urlMatching("/test.jpg")));
         }
     }
 

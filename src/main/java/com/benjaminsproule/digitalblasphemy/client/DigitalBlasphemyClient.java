@@ -42,43 +42,17 @@ public class DigitalBlasphemyClient {
 
     @NonNull
     public GetAccountInformationResponse getAccountInformation() throws IOException, ResponseException {
-        Request request = new Request.Builder()
+        Request.Builder request = new Request.Builder()
                 .url(accountInformationPath)
-                .header("Authorization", "Bearer " + apiKey)
-                .get()
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            String body = response.body().string();
-            if (response.isSuccessful()) {
-                return objectMapper.readValue(body, GetAccountInformationResponse.class);
-            }
-            try {
-                ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
-                throw new ResponseException(responseError);
-            } catch (JsonProcessingException exception) {
-                throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
-            }
-        }
+                .get();
+        return executeRequest(request, GetAccountInformationResponse.class);
     }
 
     public GetWallpapersResponse getWallpapers(@NonNull GetWallpapersRequest getWallpapersRequest) throws IOException, ResponseException {
-        Request request = new Request.Builder()
+        Request.Builder request = new Request.Builder()
                 .url(getWallpapersUrl(getWallpapersRequest))
-                .header("Authorization", "Bearer " + apiKey)
-                .get()
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            String body = response.body().string();
-            if (response.isSuccessful()) {
-                return objectMapper.readValue(body, GetWallpapersResponse.class);
-            }
-            try {
-                ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
-                throw new ResponseException(responseError);
-            } catch (JsonProcessingException exception) {
-                throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
-            }
-        }
+                .get();
+        return executeRequest(request, GetWallpapersResponse.class);
     }
 
     @NonNull
@@ -131,24 +105,12 @@ public class DigitalBlasphemyClient {
     @Nullable
     public Wallpaper getWallpaper(@NonNull GetWallpaperRequest getWallpaperRequest)
             throws IOException, ResponseException {
-        Request request = new Request.Builder()
+        Request.Builder request = new Request.Builder()
                 .url(getWallpaperUrl(getWallpaperRequest))
-                .header("Authorization", "Bearer " + apiKey)
-                .get()
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            String body = response.body().string();
-            if (response.isSuccessful()) {
-                GetWallpaperResponse getWallpaperResponse = objectMapper.readValue(body, GetWallpaperResponse.class);
-                return getWallpaperResponse.wallpaper();
-            }
-            try {
-                ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
-                throw new ResponseException(responseError);
-            } catch (JsonProcessingException exception) {
-                throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
-            }
-        }
+                .get();
+
+        GetWallpaperResponse getWallpaperResponse = executeRequest(request, GetWallpaperResponse.class);
+        return getWallpaperResponse.wallpaper();
     }
 
     @NonNull
@@ -198,36 +160,33 @@ public class DigitalBlasphemyClient {
     }
 
     public void downloadWallpaper(String filename, DownloadWallpaperRequest downloadWallpaperRequest) throws IOException, ResponseException {
-        Request request = new Request.Builder()
+        Request.Builder request = new Request.Builder()
                 .url(downloadUrl(downloadWallpaperRequest))
+                .get();
+        DownloadWallpaperResponse downloadWallpaperResponse = executeRequest(request, DownloadWallpaperResponse.class);
+        Request.Builder fileRequest = new Request.Builder()
+                .url(downloadWallpaperResponse.download().url())
+                .get();
+        byte[] body = executeRequest(fileRequest);
+        Files.write(Path.of(filename), body);
+    }
+
+    private <R> R executeRequest(Request.Builder requestBuilder, Class<R> clazz) throws IOException, ResponseException {
+        byte[] body = executeRequest(requestBuilder);
+        return objectMapper.readValue(body, clazz);
+    }
+
+    private byte[] executeRequest(Request.Builder requestBuilder) throws IOException, ResponseException {
+        Request request = requestBuilder
                 .header("Authorization", "Bearer " + apiKey)
-                .get()
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            String body = response.body().string();
             if (response.isSuccessful()) {
-                DownloadWallpaperResponse downloadWallpaperResponse = objectMapper.readValue(body, DownloadWallpaperResponse.class);
-                Request fileRequest = new Request.Builder()
-                        .url(downloadWallpaperResponse.download().url())
-                        .header("Authorization", "Bearer " + apiKey)
-                        .get()
-                        .build();
-                try (Response fileResponse = client.newCall(fileRequest).execute()) {
-                    if (fileResponse.isSuccessful()) {
-                        Files.write(Path.of(filename), fileResponse.body().bytes());
-                        return;
-                    }
-                    String fileResponseBody = fileResponse.body().string();
-                    if (fileResponse.code() == 404) {
-                        throw new ResponseException(404, "Not Found", List.of(fileResponseBody));
-                    }
-                    try {
-                        ResponseError responseError = objectMapper.readValue(fileResponseBody, ResponseError.class);
-                        throw new ResponseException(responseError);
-                    } catch (JsonProcessingException exception) {
-                        throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + fileResponseBody + "]");
-                    }
-                }
+                return response.body().bytes();
+            }
+            String body = response.body().string();
+            if (response.code() == 404) {
+                throw new ResponseException(404, "Not Found", List.of(body));
             }
             try {
                 ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
