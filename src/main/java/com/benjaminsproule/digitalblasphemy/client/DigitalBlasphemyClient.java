@@ -11,6 +11,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,6 +26,7 @@ public class DigitalBlasphemyClient {
     private final String accountInformationPath;
     private final String wallpapersPath;
     private final String wallpaperPath;
+    private final String downloadWallpaperPath;
 
     public DigitalBlasphemyClient(String apiKey) {
         this(apiKey, "https://api.digitalblasphemy.com");
@@ -33,6 +37,7 @@ public class DigitalBlasphemyClient {
         this.accountInformationPath = baseUrl + "/v2/core/account";
         this.wallpapersPath = baseUrl + "/v2/core/wallpapers";
         this.wallpaperPath = baseUrl + "/v2/core/wallpaper/";
+        this.downloadWallpaperPath = baseUrl + "/v2/core/download/wallpaper/";
     }
 
     @NonNull
@@ -134,8 +139,8 @@ public class DigitalBlasphemyClient {
         try (Response response = client.newCall(request).execute()) {
             String body = response.body().string();
             if (response.isSuccessful()) {
-                GetWallpaperResponse wallpaperResponse = objectMapper.readValue(body, GetWallpaperResponse.class);
-                return wallpaperResponse.wallpaper();
+                GetWallpaperResponse getWallpaperResponse = objectMapper.readValue(body, GetWallpaperResponse.class);
+                return getWallpaperResponse.wallpaper();
             }
             try {
                 ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
@@ -192,6 +197,55 @@ public class DigitalBlasphemyClient {
         return builder.build();
     }
 
-    public void downloadWallpaper() {
+    public void downloadWallpaper(String filename, DownloadWallpaperRequest downloadWallpaperRequest) throws IOException, ResponseException {
+        Request request = new Request.Builder()
+                .url(downloadUrl(downloadWallpaperRequest))
+                .header("Authorization", "Bearer " + apiKey)
+                .get()
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            if (response.isSuccessful()) {
+                DownloadWallpaperResponse downloadWallpaperResponse = objectMapper.readValue(body, DownloadWallpaperResponse.class);
+                Request fileRequest = new Request.Builder()
+                        .url(downloadWallpaperResponse.download().url())
+                        .header("Authorization", "Bearer " + apiKey)
+                        .get()
+                        .build();
+                try (Response fileResponse = client.newCall(fileRequest).execute()) {
+                    if (fileResponse.isSuccessful()) {
+                        Files.write(Path.of(filename), fileResponse.body().bytes());
+                        return;
+                    }
+                    String fileResponseBody = fileResponse.body().string();
+                    if (fileResponse.code() == 404) {
+                        throw new ResponseException(404, "Not Found", List.of(fileResponseBody));
+                    }
+                    try {
+                        ResponseError responseError = objectMapper.readValue(fileResponseBody, ResponseError.class);
+                        throw new ResponseException(responseError);
+                    } catch (JsonProcessingException exception) {
+                        throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + fileResponseBody + "]");
+                    }
+                }
+            }
+            try {
+                ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
+                throw new ResponseException(responseError);
+            } catch (JsonProcessingException exception) {
+                throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
+            }
+        }
+    }
+
+    private HttpUrl downloadUrl(DownloadWallpaperRequest downloadWallpaperRequest) {
+        HttpUrl.Builder builder = requireNonNull(HttpUrl.parse(downloadWallpaperPath))
+                .newBuilder()
+                .addEncodedPathSegment(downloadWallpaperRequest.getType().toString())
+                .addEncodedPathSegment(String.valueOf(downloadWallpaperRequest.getWidth()))
+                .addEncodedPathSegment(String.valueOf(downloadWallpaperRequest.getHeight()))
+                .addEncodedPathSegment(String.valueOf(downloadWallpaperRequest.getWallpaperId()))
+                .addQueryParameter("show_watermark", String.valueOf(downloadWallpaperRequest.isShowWatermark()));
+        return builder.build();
     }
 }

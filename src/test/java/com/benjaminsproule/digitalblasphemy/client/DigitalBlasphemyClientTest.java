@@ -16,9 +16,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.benjaminsproule.digitalblasphemy.client.util.FileUtils.readFile;
@@ -51,7 +54,7 @@ class DigitalBlasphemyClientTest {
     }
 
     @Nested
-    class   GetAccountInformation {
+    class GetAccountInformation {
         @Test
         void getAccountInformationCanMapSuccessfulResponse() throws IOException, URISyntaxException, ResponseException {
             stubFor(get("/v2/core/account")
@@ -666,6 +669,481 @@ class DigitalBlasphemyClientTest {
 
     @Nested
     class DownloadWallpaper {
+        @Test
+        void downloadWallpaperDoesSendShowWatermarkIfNotProvided() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Single)
+                    .width(1)
+                    .height(1)
+                    .wallpaperId(1)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "image/jpg")
+                            .withResponseBody(new Body("image-content"))));
+
+            String filename = UUID.randomUUID().toString();
+
+            underTest.downloadWallpaper(filename, downloadWallpaperRequest);
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=true".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+
+            Files.deleteIfExists(Path.of(filename));
+        }
+
+        @Test
+        void downloadWallpaperDoesSendShowWatermarkIfProvided() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Single)
+                    .width(1)
+                    .height(1)
+                    .wallpaperId(1)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "image/jpg")
+                            .withResponseBody(new Body("image-content"))));
+
+            String filename = UUID.randomUUID().toString();
+
+            underTest.downloadWallpaper(filename, downloadWallpaperRequest);
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+
+            Files.deleteIfExists(Path.of(filename));
+        }
+
+        @Test
+        void downloadWallpaperSendsPathParameters() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "image/jpg")
+                            .withResponseBody(new Body("image-content"))));
+
+            String filename = UUID.randomUUID().toString();
+
+            underTest.downloadWallpaper(filename, downloadWallpaperRequest);
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+
+            Files.deleteIfExists(Path.of(filename));
+        }
+
+        @Test
+        void downloadWallpaperCanMapSuccessfulResponseFullyPopulated() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "image/jpg")
+                            .withResponseBody(new Body("image-content"))));
+
+            String filename = UUID.randomUUID().toString();
+
+            underTest.downloadWallpaper(filename, downloadWallpaperRequest);
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+
+            Files.deleteIfExists(Path.of(filename));
+        }
+
+        @Test
+        void downloadWallpaperCanMapSuccessfulResponseMinimalPopulated() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessMinimalPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "image/jpg")
+                            .withResponseBody(new Body("image-content"))));
+
+            String filename = UUID.randomUUID().toString();
+
+            underTest.downloadWallpaper(filename, downloadWallpaperRequest);
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+
+            Files.deleteIfExists(Path.of(filename));
+        }
+
+        @Test
+        void downloadWallpaperCanMapUnauthorisedResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(unauthorized()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("unauthorisedResponse.json")
+                            ))));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 401)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unauthorized")
+                    .extracting("errors").isNull();
+
+            assertThat(Files.notExists(Path.of(filename))).isTrue();
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(0, getRequestedFor(urlMatching("/test.jpg")));
+        }
+
+        @Test
+        void downloadWallpaperCanMapUnauthorisedResponseWhenDownloadingFile() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(unauthorized()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("unauthorisedResponse.json")
+                            ))));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 401)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unauthorized")
+                    .extracting("errors").isNull();
+
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+
+            Files.deleteIfExists(Path.of(filename));
+        }
+
+        @Test
+        void downloadWallpaperCanMapBadRequestResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(badRequest()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperBadRequest.json")
+                            ))));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 400)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Bad Request")
+                    .hasFieldOrPropertyWithValue("errors", List.of(
+                            "\"type\" must be one of [single, dual, triple, mobile]",
+                            "\"width\" must be a number"
+                    ));
+
+            assertThat(Files.notExists(Path.of(filename))).isTrue();
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(0, getRequestedFor(urlMatching("/test.jpg")));
+        }
+
+        @Test
+        void downloadWallpaperCanMapNotFoundResponseWhenDownloadingFile() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(notFound()
+                            .withHeader("Content-Type", "text/plain")
+                            .withResponseBody(new Body("Object Not Found"))));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 404)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Not Found")
+                    .hasFieldOrPropertyWithValue("errors", List.of(
+                            "Object Not Found"
+                    ));
+
+            assertThat(Files.notExists(Path.of(filename))).isTrue();
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+        }
+
+        @Test
+        void downloadWallpaperCanMapUnknownErrorResponseWhenDownloadingFile() throws IOException, URISyntaxException, ResponseException {
+            DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
+                    .type(WallpaperType.Dual)
+                    .width(2)
+                    .height(3)
+                    .wallpaperId(4)
+                    .showWatermark(false)
+                    .build();
+
+            stubFor(get(urlMatching(
+                    "/v2/core/download/wallpaper/%s/%s/%s/%s\\?.*".formatted(
+                            downloadWallpaperRequest.getType(),
+                            downloadWallpaperRequest.getWidth(),
+                            downloadWallpaperRequest.getHeight(),
+                            downloadWallpaperRequest.getWallpaperId()
+                    )))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(ok()
+                            .withHeader("Content-Type", "application/json")
+                            .withResponseBody(new Body(
+                                    readFile("downloadWallpaperSuccessFullyPopulated.json")
+                                            .replace("{{host}}", wireMockServer.baseUrl())
+                            ))));
+
+            stubFor(get(urlMatching("/test.jpg"))
+                    .withHeader("Authorization", equalTo("Bearer apiKey"))
+                    .willReturn(aResponse().withStatus(405)));
+
+            String filename = UUID.randomUUID().toString();
+
+            assertThatThrownBy(() -> underTest.downloadWallpaper(filename, downloadWallpaperRequest))
+                    .isInstanceOf(ResponseException.class)
+                    .hasFieldOrPropertyWithValue("code", 0)
+                    .hasFieldOrPropertyWithValue(
+                            "description",
+                            "Unable to parse the body as JSON ErrorResponse. []")
+                    .extracting("errors").isNull();
+
+            assertThat(Files.notExists(Path.of(filename))).isTrue();
+            verify(1, getRequestedFor(urlMatching("/v2/core/download/wallpaper/%s/%s/%s/%s\\?show_watermark=false.*".formatted(
+                    downloadWallpaperRequest.getType(),
+                    downloadWallpaperRequest.getWidth(),
+                    downloadWallpaperRequest.getHeight(),
+                    downloadWallpaperRequest.getWallpaperId()
+            ))));
+            verify(1, getRequestedFor(urlMatching("/test.jpg")));
+        }
     }
 
 }

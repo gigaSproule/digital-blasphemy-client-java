@@ -57,7 +57,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.98".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
         rule {
@@ -69,19 +69,19 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "COMPLEXITY"
-                minimum = "0.98".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "METHOD"
-                minimum = "0.92".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "CLASS"
-                minimum = "0.95".toBigDecimal()
+                minimum = "1.00".toBigDecimal()
             }
         }
     }
