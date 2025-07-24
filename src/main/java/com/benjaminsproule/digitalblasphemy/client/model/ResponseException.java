@@ -16,12 +16,9 @@ public class ResponseException extends Exception {
     }
 
     public ResponseException(int code, String description, List<String> errors) {
+        super("Code: %d, Description: %s, Errors: %s".formatted(code, description, errors == null ? "[]" : errors));
         this.code = code;
         this.description = description;
         this.errors = errors;
-    }
-
-    public String toString() {
-        return "Code: %d, Description: %s, Errors: %s".formatted(code, description, errors);
     }
 }

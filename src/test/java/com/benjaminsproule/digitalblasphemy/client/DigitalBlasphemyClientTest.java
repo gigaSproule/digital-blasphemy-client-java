@@ -51,7 +51,7 @@ class DigitalBlasphemyClientTest {
     }
 
     @Nested
-    class GetAccountInformation {
+    class   GetAccountInformation {
         @Test
         void getAccountInformationCanMapSuccessfulResponse() throws IOException, URISyntaxException, ResponseException {
             stubFor(get("/v2/core/account")

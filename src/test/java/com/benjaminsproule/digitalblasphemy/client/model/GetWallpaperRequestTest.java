@@ -49,23 +49,23 @@ class GetWallpaperRequestTest {
     @Test
     void getWallpaperRequestBuilderOverridesDefaults() {
         GetWallpaperRequest request = GetWallpaperRequest.builder()
-                .wallpaperId(1)
-                .filterResHeight(2)
+                .wallpaperId(2)
+                .filterResHeight(3)
                 .filterResOperator(Operator.Equal)
                 .filterResOperatorHeight(Operator.Equal)
                 .filterResOperatorWidth(Operator.Equal)
-                .filterResWidth(3)
+                .filterResWidth(4)
                 .showComments(true)
                 .showPickleJar(true)
                 .showResolutions(false)
                 .build();
 
-        assertThat(request.getWallpaperId()).isEqualTo(1);
-        assertThat(request.getFilterResHeight()).isEqualTo(2);
+        assertThat(request.getWallpaperId()).isEqualTo(2);
+        assertThat(request.getFilterResHeight()).isEqualTo(3);
         assertThat(request.getFilterResOperator()).isEqualTo(Operator.Equal);
         assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.Equal);
         assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.Equal);
-        assertThat(request.getFilterResWidth()).isEqualTo(3);
+        assertThat(request.getFilterResWidth()).isEqualTo(4);
         assertThat(request.isShowComments()).isEqualTo(true);
         assertThat(request.isShowPickleJar()).isEqualTo(true);
         assertThat(request.isShowResolutions()).isEqualTo(false);

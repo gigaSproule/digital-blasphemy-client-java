@@ -16,9 +16,10 @@ group = "com.benjaminsproule"
 version = "0.1.0"
 
 dependencies {
+    compileOnly(libs.spotbugs.annotations)
     implementation(libs.okhttp)
     implementation(libs.jackson)
-    compileOnly(libs.spotbugs.annotations)
+    testCompileOnly(libs.spotbugs.annotations)
     testImplementation(libs.assertj)
     testImplementation(libs.wiremock)
 }
@@ -50,13 +51,13 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "INSTRUCTION"
-                minimum = "0.98".toBigDecimal()
+                minimum = "0.99".toBigDecimal()
             }
         }
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.96".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
         rule {
@@ -68,7 +69,7 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "COMPLEXITY"
-                minimum = "0.93".toBigDecimal()
+                minimum = "0.98".toBigDecimal()
             }
         }
         rule {
@@ -93,6 +94,7 @@ checkstyle {
 
 spotbugs {
     excludeFilter = file("config/spotbugs/exclude.xml")
+//    excludeBugsFile = file("config/spotbugs/exclude.xml")
 }
 
 tasks.withType<SpotBugsTask> {
