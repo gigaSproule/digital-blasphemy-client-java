@@ -1,9 +1,9 @@
 [versions]
-assertj = "3.27.2"
-jackson = "2.19.1"
+assertj = "3.27.3"
+jackson = "2.19.2"
 okhttp = "5.1.0"
 spotbugs = "4.9.3"
-wiremock = "3.9.1"
+wiremock = "3.13.1"
 
 [libraries]
 assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
