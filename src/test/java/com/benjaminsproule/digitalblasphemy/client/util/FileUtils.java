@@ -1,6 +1,6 @@
 package com.benjaminsproule.digitalblasphemy.client.util;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
