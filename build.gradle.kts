@@ -131,6 +131,13 @@ mavenPublishing {
                 url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
         }
+        developers {
+            developer {
+                id = "gigaSproule"
+                name = "Benjamin Sproule"
+                url = "https://github.com/gigaSproule/"
+            }
+        }
         scm {
             connection = "scm:git:git://github.com/gigaSproule/digital-blasphemy-client-java.git"
             developerConnection = "scm:git:ssh://github.com/gigaSproule/digital-blasphemy-client-java.git"
