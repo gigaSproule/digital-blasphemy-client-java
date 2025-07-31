@@ -31,7 +31,7 @@ jobs:
           cache: 'gradle'
       - name: Run check
         run: ./gradlew clean check
-  release-dry-run:
+  release-snapshot:
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
     needs:
@@ -48,9 +48,11 @@ jobs:
           cache: 'gradle'
       - name: Publish to maven local
         env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_KEY_PASSWORD }}
-        run: ./gradlew publishToMavenLocal
+        run: ./gradlew publishAndReleaseToMavenCentral
   release:
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
