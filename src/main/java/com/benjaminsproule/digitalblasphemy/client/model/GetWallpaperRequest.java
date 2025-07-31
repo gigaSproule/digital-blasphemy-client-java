@@ -78,7 +78,7 @@ public class GetWallpaperRequest {
 
         private Builder() {
             this.getWallPaperRequest = new GetWallpaperRequest(
-                    0, 0, Operator.GreaterThanOrEqual, Operator.GreaterThanOrEqual, Operator.GreaterThanOrEqual,
+                    0, 0, Operator.GREATER_THAN_OR_EQUAL, Operator.GREATER_THAN_OR_EQUAL, Operator.GREATER_THAN_OR_EQUAL,
                     0, false, false, true
             );
         }

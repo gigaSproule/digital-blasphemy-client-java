@@ -253,14 +253,14 @@ class DigitalBlasphemyClientTest {
                     arguments("filterDateDay", "filter_date_day", 2, "2"),
                     arguments("filterDateMonth", "filter_date_month", 2, "2"),
                     arguments("filterDateYear", "filter_date_year", 2000, "2000"),
-                    arguments("filterDateOperator", "filter_date_operator", Operator.Equal, "%3D"),
+                    arguments("filterDateOperator", "filter_date_operator", Operator.EQUAL, "%3D"),
                     arguments("filterGallery", "filter_gallery", List.of(1, 2), "1,2"),
                     arguments("filterRating", "filter_rating", 3f, "3"),
-                    arguments("filterRatingOperator", "filter_rating_operator", Operator.Equal, "%3D"),
+                    arguments("filterRatingOperator", "filter_rating_operator", Operator.EQUAL, "%3D"),
                     arguments("filterResHeight", "filter_res_height", 1080, "1080"),
-                    arguments("filterResOperator", "filter_res_operator", Operator.Equal, "%3D"),
-                    arguments("filterResOperatorHeight", "filter_res_operator_height", Operator.Equal, "%3D"),
-                    arguments("filterResOperatorWidth", "filter_res_operator_width", Operator.Equal, "%3D"),
+                    arguments("filterResOperator", "filter_res_operator", Operator.EQUAL, "%3D"),
+                    arguments("filterResOperatorHeight", "filter_res_operator_height", Operator.EQUAL, "%3D"),
+                    arguments("filterResOperatorWidth", "filter_res_operator_width", Operator.EQUAL, "%3D"),
                     arguments("filterResWidth", "filter_res_width", 1920, "1920"),
                     arguments("filterTag", "filter_tag", List.of(1, 2), "1,2"),
                     arguments("limit", "limit", 20, "20"),
@@ -474,9 +474,9 @@ class DigitalBlasphemyClientTest {
             return Stream.of(
                     arguments("filterResHeight", "filter_res_height", 1, "1"),
                     arguments("filterResWidth", "filter_res_width", 1, "1"),
-                    arguments("filterResOperator", "filter_res_operator", Operator.Equal, "%3D"),
-                    arguments("filterResOperatorHeight", "filter_res_operator_height", Operator.Equal, "%3D"),
-                    arguments("filterResOperatorWidth", "filter_res_operator_width", Operator.Equal, "%3D"),
+                    arguments("filterResOperator", "filter_res_operator", Operator.EQUAL, "%3D"),
+                    arguments("filterResOperatorHeight", "filter_res_operator_height", Operator.EQUAL, "%3D"),
+                    arguments("filterResOperatorWidth", "filter_res_operator_width", Operator.EQUAL, "%3D"),
                     arguments("showComments", "show_comments", true, "true"),
                     arguments("showPickleJar", "show_pickle_jar", true, "true"),
                     arguments("showResolutions", "show_resolutions", false, "false")
@@ -687,7 +687,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperDoesSendShowWatermarkIfNotProvided() throws IOException, URISyntaxException, ResponseException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Single)
+                    .type(WallpaperType.SINGLE)
                     .width(1)
                     .height(1)
                     .wallpaperId(1)
@@ -732,7 +732,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperDoesSendShowWatermarkIfProvided() throws IOException, URISyntaxException, ResponseException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Single)
+                    .type(WallpaperType.SINGLE)
                     .width(1)
                     .height(1)
                     .wallpaperId(1)
@@ -778,7 +778,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperSendsPathParameters() throws IOException, URISyntaxException, ResponseException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -824,7 +824,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapSuccessfulResponseFullyPopulated() throws IOException, URISyntaxException, ResponseException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -870,7 +870,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapSuccessfulResponseMinimalPopulated() throws IOException, URISyntaxException, ResponseException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -916,7 +916,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapUnauthorisedResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -960,7 +960,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapUnauthorisedResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -1014,7 +1014,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapBadRequestResponseWhenGettingDownloadWallpaperResponse() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -1061,7 +1061,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapNotFoundResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -1114,7 +1114,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperCanMapUnknownErrorResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -1163,7 +1163,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperNoResponseWhenGettingDownloadWallpaperResponse() {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)
@@ -1200,7 +1200,7 @@ class DigitalBlasphemyClientTest {
         @Test
         void downloadWallpaperNoResponseWhenDownloadingFile() throws IOException, URISyntaxException {
             DownloadWallpaperRequest downloadWallpaperRequest = DownloadWallpaperRequest.builder()
-                    .type(WallpaperType.Dual)
+                    .type(WallpaperType.DUAL)
                     .width(2)
                     .height(3)
                     .wallpaperId(4)

@@ -37,9 +37,9 @@ class GetWallpaperRequestTest {
 
         assertThat(request.getWallpaperId()).isEqualTo(1);
         assertThat(request.getFilterResHeight()).isEqualTo(0);
-        assertThat(request.getFilterResOperator()).isEqualTo(Operator.GreaterThanOrEqual);
-        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.GreaterThanOrEqual);
-        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.GreaterThanOrEqual);
+        assertThat(request.getFilterResOperator()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
+        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
+        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
         assertThat(request.getFilterResWidth()).isEqualTo(0);
         assertThat(request.isShowComments()).isEqualTo(false);
         assertThat(request.isShowPickleJar()).isEqualTo(false);
@@ -51,9 +51,9 @@ class GetWallpaperRequestTest {
         GetWallpaperRequest request = GetWallpaperRequest.builder()
                 .wallpaperId(2)
                 .filterResHeight(3)
-                .filterResOperator(Operator.Equal)
-                .filterResOperatorHeight(Operator.Equal)
-                .filterResOperatorWidth(Operator.Equal)
+                .filterResOperator(Operator.EQUAL)
+                .filterResOperatorHeight(Operator.EQUAL)
+                .filterResOperatorWidth(Operator.EQUAL)
                 .filterResWidth(4)
                 .showComments(true)
                 .showPickleJar(true)
@@ -62,9 +62,9 @@ class GetWallpaperRequestTest {
 
         assertThat(request.getWallpaperId()).isEqualTo(2);
         assertThat(request.getFilterResHeight()).isEqualTo(3);
-        assertThat(request.getFilterResOperator()).isEqualTo(Operator.Equal);
-        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.Equal);
-        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.Equal);
+        assertThat(request.getFilterResOperator()).isEqualTo(Operator.EQUAL);
+        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.EQUAL);
+        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.EQUAL);
         assertThat(request.getFilterResWidth()).isEqualTo(4);
         assertThat(request.isShowComments()).isEqualTo(true);
         assertThat(request.isShowPickleJar()).isEqualTo(true);

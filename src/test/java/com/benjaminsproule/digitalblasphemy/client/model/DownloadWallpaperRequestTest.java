@@ -77,7 +77,7 @@ class DownloadWallpaperRequestTest {
     void downloadWallpaperRequestBuilderProvidesDefaults() {
         DownloadWallpaperRequest request = DownloadWallpaperRequest.builder().wallpaperId(1).width(1).height(1).build();
 
-        assertThat(request.getType()).isEqualTo(WallpaperType.Single);
+        assertThat(request.getType()).isEqualTo(WallpaperType.SINGLE);
         assertThat(request.getWallpaperId()).isEqualTo(1);
         assertThat(request.getWidth()).isEqualTo(1);
         assertThat(request.getHeight()).isEqualTo(1);
@@ -87,14 +87,14 @@ class DownloadWallpaperRequestTest {
     @Test
     void downloadWallpaperRequestBuilderOverridesDefaults() {
         DownloadWallpaperRequest request = DownloadWallpaperRequest.builder()
-                .type(WallpaperType.Dual)
+                .type(WallpaperType.DUAL)
                 .wallpaperId(2)
                 .width(3)
                 .height(4)
                 .showWatermark(false)
                 .build();
 
-        assertThat(request.getType()).isEqualTo(WallpaperType.Dual);
+        assertThat(request.getType()).isEqualTo(WallpaperType.DUAL);
         assertThat(request.getWallpaperId()).isEqualTo(2);
         assertThat(request.getWidth()).isEqualTo(3);
         assertThat(request.getHeight()).isEqualTo(4);

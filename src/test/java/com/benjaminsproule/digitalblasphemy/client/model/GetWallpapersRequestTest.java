@@ -124,14 +124,14 @@ class GetWallpapersRequestTest {
         assertThat(request.getFilterDateDay()).isEqualTo(0);
         assertThat(request.getFilterDateMonth()).isEqualTo(0);
         assertThat(request.getFilterDateYear()).isEqualTo(0);
-        assertThat(request.getFilterDateOperator()).isEqualTo(Operator.GreaterThanOrEqual);
+        assertThat(request.getFilterDateOperator()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
         assertThat(request.getFilterGallery()).isEqualTo(emptyList());
         assertThat(request.getFilterRating()).isEqualTo(0f);
-        assertThat(request.getFilterRatingOperator()).isEqualTo(Operator.GreaterThanOrEqual);
+        assertThat(request.getFilterRatingOperator()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
         assertThat(request.getFilterResHeight()).isEqualTo(0);
-        assertThat(request.getFilterResOperator()).isEqualTo(Operator.GreaterThanOrEqual);
-        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.GreaterThanOrEqual);
-        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.GreaterThanOrEqual);
+        assertThat(request.getFilterResOperator()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
+        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
+        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.GREATER_THAN_OR_EQUAL);
         assertThat(request.getFilterResWidth()).isEqualTo(0);
         assertThat(request.getFilterTag()).isEqualTo(emptyList());
         assertThat(request.getLimit()).isEqualTo(10);
@@ -150,14 +150,14 @@ class GetWallpapersRequestTest {
                 .filterDateDay(2)
                 .filterDateMonth(2)
                 .filterDateYear(2000)
-                .filterDateOperator(Operator.Equal)
+                .filterDateOperator(Operator.EQUAL)
                 .filterGallery(List.of(1, 2))
                 .filterRating(2.5f)
-                .filterRatingOperator(Operator.Equal)
+                .filterRatingOperator(Operator.EQUAL)
                 .filterResHeight(1080)
-                .filterResOperator(Operator.Equal)
-                .filterResOperatorHeight(Operator.Equal)
-                .filterResOperatorWidth(Operator.Equal)
+                .filterResOperator(Operator.EQUAL)
+                .filterResOperatorHeight(Operator.EQUAL)
+                .filterResOperatorWidth(Operator.EQUAL)
                 .filterResWidth(1920)
                 .filterTag(List.of(1, 2))
                 .limit(20)
@@ -173,14 +173,14 @@ class GetWallpapersRequestTest {
         assertThat(request.getFilterDateDay()).isEqualTo(2);
         assertThat(request.getFilterDateMonth()).isEqualTo(2);
         assertThat(request.getFilterDateYear()).isEqualTo(2000);
-        assertThat(request.getFilterDateOperator()).isEqualTo(Operator.Equal);
+        assertThat(request.getFilterDateOperator()).isEqualTo(Operator.EQUAL);
         assertThat(request.getFilterGallery()).isEqualTo(List.of(1, 2));
         assertThat(request.getFilterRating()).isEqualTo(2.5f);
-        assertThat(request.getFilterRatingOperator()).isEqualTo(Operator.Equal);
+        assertThat(request.getFilterRatingOperator()).isEqualTo(Operator.EQUAL);
         assertThat(request.getFilterResHeight()).isEqualTo(1080);
-        assertThat(request.getFilterResOperator()).isEqualTo(Operator.Equal);
-        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.Equal);
-        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.Equal);
+        assertThat(request.getFilterResOperator()).isEqualTo(Operator.EQUAL);
+        assertThat(request.getFilterResOperatorHeight()).isEqualTo(Operator.EQUAL);
+        assertThat(request.getFilterResOperatorWidth()).isEqualTo(Operator.EQUAL);
         assertThat(request.getFilterResWidth()).isEqualTo(1920);
         assertThat(request.getFilterTag()).isEqualTo(List.of(1, 2));
         assertThat(request.getLimit()).isEqualTo(20);

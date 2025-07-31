@@ -52,7 +52,7 @@ public class DownloadWallpaperRequest {
 
         private Builder() {
             this.downloadWallpaperRequest = new DownloadWallpaperRequest(
-                    WallpaperType.Single, 0, 0, 0, true
+                    WallpaperType.SINGLE, 0, 0, 0, true
             );
         }
 

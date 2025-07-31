@@ -2,17 +2,19 @@ package com.benjaminsproule.digitalblasphemy.client.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
+
 public enum Operator {
     @JsonProperty("=")
-    Equal("="),
+    EQUAL("="),
     @JsonProperty(">")
-    GreaterThan(">"),
+    GREATER_THAN(">"),
     @JsonProperty(">=")
-    GreaterThanOrEqual(">="),
+    GREATER_THAN_OR_EQUAL(">="),
     @JsonProperty("<")
-    LessThan("<"),
+    LESS_THAN("<"),
     @JsonProperty("<=")
-    LessThanOrEqual("<=");
+    LESS_THAN_OR_EQUAL("<=");
 
     private final String operator;
 
@@ -22,5 +24,12 @@ public enum Operator {
 
     public String toString() {
         return this.operator;
+    }
+
+    public static Operator of(String operator) {
+        return Arrays.stream(Operator.values())
+                .filter(value -> value.operator.equals(operator))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("%s is not a valid Operator".formatted(operator)));
     }
 }

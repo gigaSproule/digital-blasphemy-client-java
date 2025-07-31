@@ -2,15 +2,17 @@ package com.benjaminsproule.digitalblasphemy.client.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
+
 public enum WallpaperType {
     @JsonProperty("single")
-    Single("single"),
+    SINGLE("single"),
     @JsonProperty("dual")
-    Dual("dual"),
+    DUAL("dual"),
     @JsonProperty("triple")
-    Triple("triple"),
+    TRIPLE("triple"),
     @JsonProperty("mobile")
-    Mobile("mobile");
+    MOBILE("mobile");
 
     private final String type;
 
@@ -20,5 +22,12 @@ public enum WallpaperType {
 
     public String toString() {
         return this.type;
+    }
+
+    public static WallpaperType of(String type) {
+        return Arrays.stream(WallpaperType.values())
+                .filter(value -> value.type.equals(type))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("%s is not a valid WallpaperType".formatted(type)));
     }
 }

@@ -152,9 +152,9 @@ public class GetWallpapersRequest {
 
         private Builder() {
             this.getWallPapersRequest = new GetWallpapersRequest(
-                    0, 0, 0, Operator.GreaterThanOrEqual, emptyList(),
-                    0f, Operator.GreaterThanOrEqual, 0, Operator.GreaterThanOrEqual,
-                    Operator.GreaterThanOrEqual, Operator.GreaterThanOrEqual, 0, emptyList(), 10,
+                    0, 0, 0, Operator.GREATER_THAN_OR_EQUAL, emptyList(),
+                    0f, Operator.GREATER_THAN_OR_EQUAL, 0, Operator.GREATER_THAN_OR_EQUAL,
+                    Operator.GREATER_THAN_OR_EQUAL, Operator.GREATER_THAN_OR_EQUAL, 0, emptyList(), 10,
                     Order.ASCENDING, GetWallpapersOrderBy.DATE, 1, "", false, false,
                     true
             );
