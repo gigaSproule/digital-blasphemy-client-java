@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.http.Body;
 import com.github.tomakehurst.wiremock.http.Fault;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -296,8 +297,338 @@ class DigitalBlasphemyClientTest {
 
         public static Stream<Arguments> successfulResponse() throws IOException, URISyntaxException {
             return Stream.of(
-                    arguments(readFile("getWallpaperSuccessFullyPopulated.json"), new GetWallpapersResponse()),
-                    arguments(readFile("getWallpapersSuccessMinimalPopulated.json"), new GetWallpapersResponse())
+                    arguments(readFile("getWallpapersSuccessFullyPopulated.json"), new GetWallpapersResponse(
+                            new GetWallpapersResponse.DBCore(
+                                    1,
+                                    new Endpoints(
+                                            "https://api.digitalblasphemy.com/v2/core",
+                                            "https://arcadia.digitalblasphemy.com",
+                                            "https://cdn.digitalblasphemy.com",
+                                            "https://digitalblasphemy.com"
+                                    ),
+                                    new GetWallpapersResponse.DBCore.Request(
+                                            new GetWallpapersResponse.DBCore.Request.Query(
+                                                    2, 3, 4, Operator.EQUAL, List.of(5), 6,
+                                                    Operator.GREATER_THAN_OR_EQUAL, Operator.GREATER_THAN_OR_EQUAL, Operator.GREATER_THAN_OR_EQUAL,
+                                                    7, Operator.GREATER_THAN_OR_EQUAL, 8, List.of(9), 10,
+                                                    Order.ASCENDING, GetWallpapersOrderBy.NAME, 11, "search", true, true, true
+                                            )
+                                    ),
+                                    12,
+                                    Map.of(
+                                            "40", new Wallpaper(
+                                                    40,
+                                                    false,
+                                                    new Wallpaper.Comments(List.of(
+                                                            new Wallpaper.Comments.Comment(
+                                                                    "41",
+                                                                    "author ID 3",
+                                                                    "author display 3",
+                                                                    "Content 4",
+                                                                    "42",
+                                                                    43
+                                                            ),
+                                                            new Wallpaper.Comments.Comment(
+                                                                    "44",
+                                                                    "author ID 4",
+                                                                    "author display 4",
+                                                                    "Content 5",
+                                                                    "45",
+                                                                    46
+                                                            )
+                                                    )),
+                                                    "Content 6",
+                                                    false,
+                                                    "Valley I",
+                                                    new Wallpaper.Paths(
+                                                            "/wallpaper/40",
+                                                            "/thumbnail/48x49/valley_thumbnail_48x49.jpg",
+                                                            "/sec/valley/"
+                                                    ),
+                                                    new Wallpaper.PickleJar(
+                                                            "parent 2",
+                                                            List.of("sibling 3", "sibling 4")
+                                                    ),
+                                                    "47",
+                                                    new Wallpaper.Resolutions(
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "48x49",
+                                                                            "48",
+                                                                            "49",
+                                                                            "/single/48x49/valley_single_48x49.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "50x51",
+                                                                            "50",
+                                                                            "51",
+                                                                            "/single/50x51/valley_single_50x51.jpg"
+                                                                    )
+                                                            ),
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "52x53",
+                                                                            "52",
+                                                                            "53",
+                                                                            "/dual/52x53/valley_dual_52x53.jpg"
+
+                                                                    ),
+
+                                                                    new Wallpaper.Resolutions
+                                                                            .Resolution(
+
+                                                                            "54x55",
+                                                                            "54",
+
+                                                                            "55",
+                                                                            "/dual/54x55/valley_dual_54x55.jpg"
+                                                                    )
+                                                            ),
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "56x57",
+                                                                            "56",
+                                                                            "57",
+                                                                            "/triple/56x57/valley_triple_56x57.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "58x59",
+                                                                            "58",
+                                                                            "59",
+                                                                            "/triple/58x59/valley_triple_58x59.jpg"
+                                                                    )
+                                                            ),
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "60x61",
+                                                                            "60",
+                                                                            "61",
+                                                                            "/mobile/60x61/valley_mobile_60x61.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "62x63",
+                                                                            "62",
+                                                                            "63",
+                                                                            "/mobile/62x63/valley_mobile_62x63.jpg"
+                                                                    )
+                                                            )
+                                                    ),
+                                                    "valley",
+                                                    Map.of(
+                                                            "64", new Wallpaper.Tag(
+                                                                    64,
+                                                                    "Tag 3"
+                                                            ),
+                                                            "65", new Wallpaper.Tag(
+                                                                    65,
+                                                                    "Tag 4"
+                                                            )
+                                                    ),
+                                                    66L
+                                            ),
+                                            "13", new Wallpaper(
+                                                    13,
+                                                    true,
+                                                    new Wallpaper.Comments(List.of(
+                                                            new Wallpaper.Comments.Comment(
+                                                                    "14",
+                                                                    "author ID 1",
+                                                                    "author display 1",
+                                                                    "Content 1",
+                                                                    "15",
+                                                                    16
+                                                            ),
+                                                            new Wallpaper.Comments.Comment(
+                                                                    "17",
+                                                                    "author ID 2",
+                                                                    "author display 2",
+                                                                    "Content 2",
+                                                                    "18",
+                                                                    19
+                                                            )
+                                                    )),
+                                                    "Content 3",
+                                                    true,
+                                                    "Vulcan",
+                                                    new Wallpaper.Paths(
+                                                            "/wallpaper/13",
+                                                            "/thumbnail/21x22/vulcan_thumbnail_21x22.jpg",
+                                                            "/sec/vulcan/"
+                                                    ),
+                                                    new Wallpaper.PickleJar("parent 1", List.of("sibling 1", "sibling 2")),
+                                                    "20",
+                                                    new Wallpaper.Resolutions(
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "21x22",
+                                                                            "21",
+                                                                            "22",
+                                                                            "/single/21x22/vulcan_single_21x22.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "23x24",
+                                                                            "23",
+                                                                            "24",
+                                                                            "/single/23x24/vulcan_single_23x24.jpg"
+                                                                    )
+                                                            ),
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "25x26",
+                                                                            "25",
+                                                                            "26",
+                                                                            "/dual/25x26/vulcan_dual_25x26.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "27x28",
+                                                                            "27",
+                                                                            "28",
+                                                                            "/dual/27x28/vulcan_dual_27x28.jpg"
+                                                                    )
+                                                            ),
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "29x30",
+                                                                            "29",
+                                                                            "30",
+                                                                            "/triple/29x30/vulcan_triple_29x30.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "31x32",
+                                                                            "31",
+                                                                            "32",
+                                                                            "/triple/31x32/vulcan_triple_31x32.jpg"
+                                                                    )
+                                                            ),
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "33x34",
+                                                                            "33",
+                                                                            "34",
+                                                                            "/mobile/33x34/vulcan_mobile_33x34.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "35x36",
+                                                                            "35",
+                                                                            "36",
+                                                                            "/mobile/35x36/vulcan_mobile_35x36.jpg"
+                                                                    )
+                                                            )
+                                                    ),
+                                                    "vulcan",
+                                                    Map.of(
+                                                            "37", new Wallpaper.Tag(
+                                                                    37,
+                                                                    "Tag 1"
+                                                            ),
+                                                            "38", new Wallpaper.Tag(
+                                                                    38,
+                                                                    "Tag 2"
+                                                            )
+                                                    ),
+                                                    39L
+                                            )
+                                    )
+                            ),
+                            List.of(13, 40)
+                    )),
+                    arguments(readFile("getWallpapersSuccessMinimalPopulated.json"), new GetWallpapersResponse(
+                            new GetWallpapersResponse.DBCore(
+                                    1,
+                                    new Endpoints(
+                                            "https://api.digitalblasphemy.com/v2/core",
+                                            "https://arcadia.digitalblasphemy.com",
+                                            "https://cdn.digitalblasphemy.com",
+                                            "https://digitalblasphemy.com"
+                                    ),
+                                    new GetWallpapersResponse.DBCore.Request(
+                                            new GetWallpapersResponse.DBCore.Request.Query(
+                                                    null, null, null, Operator.EQUAL, null,
+                                                    null, null, null, null, 2,
+                                                    Operator.GREATER_THAN_OR_EQUAL, 3, null, 4, Order.ASCENDING, GetWallpapersOrderBy.NAME,
+                                                    5, null, false, false, false
+                                            )
+                                    ),
+                                    6,
+                                    Map.of(
+                                            "7", new Wallpaper(
+                                                    7,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    "Vulcan",
+                                                    new Wallpaper.Paths(
+                                                            "/wallpaper/7",
+                                                            "/thumbnail/8x9/vulcan_thumbnail_8x9.jpg",
+                                                            "/sec/vulcan/"
+                                                    ),
+                                                    null,
+                                                    null,
+                                                    new Wallpaper.Resolutions(
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "8x9",
+                                                                            "8",
+                                                                            "9",
+                                                                            "/single/8x9/vulcan_single_8x9.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "10x11",
+                                                                            "10",
+                                                                            "11",
+                                                                            "/single/10x11/vulcan_single_10x11.jpg"
+                                                                    )
+                                                            ),
+                                                            null,
+                                                            null,
+                                                            null
+                                                    ),
+                                                    null,
+                                                    null,
+                                                    null
+                                            ),
+                                            "12", new Wallpaper(
+                                                    12,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    "Valley I",
+                                                    new Wallpaper.Paths(
+                                                            "/wallpaper/12",
+                                                            "/thumbnail/13x14/valley_thumbnail_13x14.jpg",
+                                                            "/sec/valley/"
+                                                    ),
+                                                    null,
+                                                    null,
+                                                    new Wallpaper.Resolutions(
+                                                            List.of(
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "13x14",
+                                                                            "13",
+                                                                            "14",
+                                                                            "/single/13x14/valley_single_13x14.jpg"
+                                                                    ),
+                                                                    new Wallpaper.Resolutions.Resolution(
+                                                                            "15x16",
+                                                                            "15",
+                                                                            "16",
+                                                                            "/single/15x16/valley_single_15x16.jpg"
+                                                                    )
+                                                            ),
+                                                            null,
+                                                            null,
+                                                            null
+                                                    ),
+                                                    null,
+                                                    null,
+                                                    null
+                                            )
+                                    )
+                            ),
+                            List.of(7, 12)
+                    ))
             );
         }
 
