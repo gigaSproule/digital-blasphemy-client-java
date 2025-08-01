@@ -46,13 +46,13 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - name: Publish to maven local
+      - name: Publish snapshot to maven central
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_KEY_PASSWORD }}
-        run: ./gradlew publishAndReleaseToMavenCentral
+        run: ./gradlew publishToMavenCentral
   release:
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
@@ -79,7 +79,7 @@ jobs:
         run: |
           git add version.txt
           git commit -m "chore: set version to ${{ github.ref_name }}"
-      - name: Publish to maven repository
+      - name: Publish to maven central
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
