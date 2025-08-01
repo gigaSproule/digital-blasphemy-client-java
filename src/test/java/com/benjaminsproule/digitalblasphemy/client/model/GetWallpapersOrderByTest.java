@@ -13,6 +13,19 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class GetWallpapersOrderByTest {
 
+    @MethodSource("toStringArguments")
+    @ParameterizedTest
+    void toStringReturnsCorrectValue(GetWallpapersOrderBy getWallpapersOrderBy, String expectedValue) {
+        assertThat(getWallpapersOrderBy.toString()).isEqualTo(expectedValue);
+    }
+
+    public static Stream<Arguments> toStringArguments() {
+        return Stream.of(
+                arguments(GetWallpapersOrderBy.DATE, "date"),
+                arguments(GetWallpapersOrderBy.NAME, "name")
+        );
+    }
+
     @MethodSource("ofArguments")
     @ParameterizedTest
     void ofReturnsCorrectType(String orderBy, GetWallpapersOrderBy expectedOperator) {
