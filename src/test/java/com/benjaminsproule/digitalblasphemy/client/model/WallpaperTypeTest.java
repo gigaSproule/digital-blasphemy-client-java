@@ -13,6 +13,21 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class WallpaperTypeTest {
 
+    @MethodSource("toStringArguments")
+    @ParameterizedTest
+    void toStringReturnsCorrectValue(WallpaperType wallpaperType, String expectedValue) {
+        assertThat(wallpaperType.toString()).isEqualTo(expectedValue);
+    }
+
+    public static Stream<Arguments> toStringArguments() {
+        return Stream.of(
+                arguments(WallpaperType.SINGLE, "single"),
+                arguments(WallpaperType.DUAL, "dual"),
+                arguments(WallpaperType.TRIPLE, "triple"),
+                arguments(WallpaperType.MOBILE, "mobile")
+        );
+    }
+
     @MethodSource("ofArguments")
     @ParameterizedTest
     void ofReturnsCorrectType(String type, WallpaperType expectedWallpaperType) {

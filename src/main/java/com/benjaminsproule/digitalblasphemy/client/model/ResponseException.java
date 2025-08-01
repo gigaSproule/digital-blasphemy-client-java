@@ -21,4 +21,16 @@ public class ResponseException extends Exception {
         this.description = description;
         this.errors = errors;
     }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
 }
