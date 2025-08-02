@@ -2,7 +2,7 @@ package com.benjaminsproule.digitalblasphemy.client.model;
 
 import java.util.List;
 
-public class ResponseException extends Exception {
+public class ResponseException extends RuntimeException {
     private final int code;
     private final String description;
     private final List<String> errors;

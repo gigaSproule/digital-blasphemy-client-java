@@ -88,8 +88,8 @@ tasks.jacocoTestCoverageVerification {
 }
 
 checkstyle {
-    config = project.resources.text.fromFile("config/checkstyle.xml")
-//        project.resources.text.fromUri("https://raw.githubusercontent.com/gigaSproule/checkstyle-config/refs/heads/main/checkstyle.xml")
+    config =
+        project.resources.text.fromUri("https://raw.githubusercontent.com/gigaSproule/checkstyle-config/refs/heads/main/checkstyle.xml")
 }
 
 spotbugs {

@@ -6,31 +6,32 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DownloadWallpaperResponse(
-        @NonNull @JsonProperty("db_core") DBCore dbCore,
-        @NonNull Download download) {
+        @NonNull @JsonProperty(value = "db_core", required = true) DBCore dbCore,
+        @NonNull @JsonProperty(required = true) Download download) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record DBCore(
+            @JsonProperty(required = true)
             long timestamp,
-            @NonNull Endpoints endpoints,
-            @NonNull Request request) {
+            @NonNull @JsonProperty(required = true) Endpoints endpoints,
+            @NonNull @JsonProperty(required = true) Request request) {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Request(@NonNull Params params) {
+        public record Request(@NonNull @JsonProperty(required = true) Params params) {
 
             @JsonIgnoreProperties(ignoreUnknown = true)
             public record Params(
-                    @NonNull WallpaperType type,
-                    int width,
-                    int height,
-                    @JsonProperty("wallpaper_id") int wallpaperId) {
+                    @NonNull @JsonProperty(required = true) WallpaperType type,
+                    @JsonProperty(required = true) int width,
+                    @JsonProperty(required = true) int height,
+                    @JsonProperty(value = "wallpaper_id", required = true) int wallpaperId) {
             }
         }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Download(
-            long expiration,
-            @NonNull String url) {
+            @JsonProperty(required = true) long expiration,
+            @NonNull @JsonProperty(required = true) String url) {
     }
 }

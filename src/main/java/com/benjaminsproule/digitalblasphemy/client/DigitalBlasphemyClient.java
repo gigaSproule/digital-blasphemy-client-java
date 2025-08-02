@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
@@ -47,14 +48,14 @@ public class DigitalBlasphemyClient {
     }
 
     @NonNull
-    public GetAccountInformationResponse getAccountInformation() throws IOException, ResponseException, InterruptedException {
+    public CompletableFuture<GetAccountInformationResponse> getAccountInformation() {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(accountInformationPath)
                 .GET();
         return executeRequest(request, GetAccountInformationResponse.class);
     }
 
-    public GetWallpapersResponse getWallpapers(@NonNull GetWallpapersRequest getWallpapersRequest) throws IOException, ResponseException, InterruptedException {
+    public CompletableFuture<GetWallpapersResponse> getWallpapers(@NonNull GetWallpapersRequest getWallpapersRequest) {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(getWallpapersUrl(getWallpapersRequest))
                 .GET();
@@ -108,14 +109,14 @@ public class DigitalBlasphemyClient {
     }
 
     @Nullable
-    public Wallpaper getWallpaper(@NonNull GetWallpaperRequest getWallpaperRequest)
+    public CompletableFuture<Wallpaper> getWallpaper(@NonNull GetWallpaperRequest getWallpaperRequest)
             throws IOException, ResponseException, InterruptedException {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(getWallpaperUrl(getWallpaperRequest))
                 .GET();
 
-        GetWallpaperResponse getWallpaperResponse = executeRequest(request, GetWallpaperResponse.class);
-        return getWallpaperResponse.wallpaper();
+        return executeRequest(request, GetWallpaperResponse.class)
+                .thenApplyAsync(GetWallpaperResponse::wallpaper);
     }
 
     @NonNull
@@ -163,42 +164,57 @@ public class DigitalBlasphemyClient {
         return createUri(wallpaperPath, paths, queryParams);
     }
 
-    public void downloadWallpaper(Path filename, DownloadWallpaperRequest downloadWallpaperRequest)
-            throws IOException, ResponseException, InterruptedException {
+    public CompletableFuture<Void> downloadWallpaper(Path filename, DownloadWallpaperRequest downloadWallpaperRequest) {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(downloadUrl(downloadWallpaperRequest))
                 .GET();
-        DownloadWallpaperResponse downloadWallpaperResponse = executeRequest(request, DownloadWallpaperResponse.class);
-        HttpRequest.Builder fileRequest = HttpRequest.newBuilder()
-                .uri(URI.create(downloadWallpaperResponse.download().url()))
-                .GET();
-        byte[] body = executeRequest(fileRequest);
-        Files.write(filename, body);
+        return executeRequest(request, DownloadWallpaperResponse.class)
+                .thenComposeAsync(downloadWallpaperResponse -> {
+                    HttpRequest.Builder fileRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(downloadWallpaperResponse.download().url()))
+                            .GET();
+                    return executeRequest(fileRequest)
+                            .thenAcceptAsync(body -> {
+                                try {
+                                    Files.write(filename, body);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                });
     }
 
-    private <R> R executeRequest(HttpRequest.Builder requestBuilder, Class<R> clazz) throws IOException, ResponseException, InterruptedException {
-        byte[] body = executeRequest(requestBuilder);
-        return objectMapper.readValue(body, clazz);
+    private <R> CompletableFuture<R> executeRequest(HttpRequest.Builder requestBuilder, Class<R> clazz) {
+        return executeRequest(requestBuilder)
+                .thenApplyAsync(body -> {
+                    try {
+                        return objectMapper.readValue(body, clazz);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
-    private byte[] executeRequest(HttpRequest.Builder requestBuilder) throws IOException, ResponseException, InterruptedException {
+    private CompletableFuture<byte[]> executeRequest(HttpRequest.Builder requestBuilder) {
         HttpRequest request = requestBuilder
                 .header("Authorization", "Bearer " + apiKey)
                 .build();
-        HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        if (response.statusCode() == 200) {
-            return response.body();
-        }
-        String body = new String(response.body(), StandardCharsets.UTF_8);
-        if (response.statusCode() == 404) {
-            throw new ResponseException(404, "Not Found", List.of(body));
-        }
-        try {
-            ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
-            throw new ResponseException(responseError);
-        } catch (JsonProcessingException exception) {
-            throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
-        }
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray())
+                .thenApplyAsync(response -> {
+                    if (response.statusCode() == 200) {
+                        return response.body();
+                    }
+                    String body = new String(response.body(), StandardCharsets.UTF_8);
+                    if (response.statusCode() == 404) {
+                        throw new ResponseException(404, "Not Found", List.of(body));
+                    }
+                    try {
+                        ResponseError responseError = objectMapper.readValue(body, ResponseError.class);
+                        throw new ResponseException(responseError);
+                    } catch (JsonProcessingException exception) {
+                        throw new ResponseException(0, "Unable to parse the body as JSON ErrorResponse. [" + body + "]");
+                    }
+                });
     }
 
     @NonNull

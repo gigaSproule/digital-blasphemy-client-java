@@ -52,4 +52,22 @@ class ResponseExceptionTest {
         }
     }
 
+    @Test
+    void testGetCode() {
+        ResponseException responseException = new ResponseException(1, "description", List.of("Error1", "Error2"));
+        assertThat(responseException.getCode()).isEqualTo(1);
+    }
+
+    @Test
+    void testGetDescription() {
+        ResponseException responseException = new ResponseException(1, "description", List.of("Error1", "Error2"));
+        assertThat(responseException.getDescription()).isEqualTo("description");
+    }
+
+    @Test
+    void testGetErrors() {
+        ResponseException responseException = new ResponseException(1, "description", List.of("Error1", "Error2"));
+        assertThat(responseException.getErrors()).isEqualTo(List.of("Error1", "Error2"));
+    }
+
 }
