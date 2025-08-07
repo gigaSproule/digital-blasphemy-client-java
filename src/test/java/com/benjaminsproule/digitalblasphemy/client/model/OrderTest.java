@@ -13,6 +13,19 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class OrderTest {
 
+    @MethodSource("toStringArguments")
+    @ParameterizedTest
+    void toStringReturnsCorrectValue(Order order, String expectedValue) {
+        assertThat(order.toString()).isEqualTo(expectedValue);
+    }
+
+    public static Stream<Arguments> toStringArguments() {
+        return Stream.of(
+                arguments(Order.ASCENDING, "asc"),
+                arguments(Order.DESCENDING, "desc")
+        );
+    }
+
     @MethodSource("ofArguments")
     @ParameterizedTest
     void ofReturnsCorrectType(String order, Order expectedOrder) {

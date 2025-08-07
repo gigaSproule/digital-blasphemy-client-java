@@ -18,7 +18,6 @@ version = rootProject.file("version.txt").readText().trim()
 
 dependencies {
     compileOnly(libs.spotbugs.annotations)
-    implementation(libs.okhttp)
     implementation(libs.jackson)
     testCompileOnly(libs.spotbugs.annotations)
     testImplementation(libs.assertj)

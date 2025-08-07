@@ -13,6 +13,22 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class OperatorTest {
 
+    @MethodSource("toStringArguments")
+    @ParameterizedTest
+    void toStringReturnsCorrectValue(Operator operator, String expectedValue) {
+        assertThat(operator.toString()).isEqualTo(expectedValue);
+    }
+
+    public static Stream<Arguments> toStringArguments() {
+        return Stream.of(
+                arguments(Operator.EQUAL, "="),
+                arguments(Operator.GREATER_THAN, ">"),
+                arguments(Operator.GREATER_THAN_OR_EQUAL, ">="),
+                arguments(Operator.LESS_THAN, "<"),
+                arguments(Operator.LESS_THAN_OR_EQUAL, "<=")
+        );
+    }
+
     @MethodSource("ofArguments")
     @ParameterizedTest
     void ofReturnsCorrectType(String operator, Operator expectedOperator) {
