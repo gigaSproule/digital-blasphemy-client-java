@@ -1,5 +1,5 @@
 [versions]
-assertj = "3.27.4"
+assertj = "3.27.5"
 jackson = "2.20.0"
 spotbugs = "4.9.6"
 wiremock = "3.13.1"
