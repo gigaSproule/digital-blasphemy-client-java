@@ -1,6 +1,6 @@
 [versions]
 assertj = "3.27.6"
-jackson = "2.20.0"
+jackson = "2.20.1"
 spotbugs = "4.9.8"
 wiremock = "3.13.1"
 
