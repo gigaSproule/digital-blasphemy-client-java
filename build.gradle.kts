@@ -6,7 +6,7 @@ plugins {
     checkstyle
     id("com.vanniktech.maven.publish") version "0.35.0"
     id("com.github.spotbugs") version "6.4.8"
-    id("info.solidsoft.pitest") version "1.19.0-rc.2"
+    id("info.solidsoft.pitest") version "1.19.0-rc.3"
 }
 
 repositories {
