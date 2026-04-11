@@ -5,7 +5,7 @@ plugins {
     jacoco
     checkstyle
     id("com.vanniktech.maven.publish") version "0.36.0"
-    id("com.github.spotbugs") version "6.4.8"
+    id("com.github.spotbugs") version "6.4.11"
     id("info.solidsoft.pitest") version "1.19.0"
 }
 
