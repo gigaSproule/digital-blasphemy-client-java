@@ -30,7 +30,7 @@ jobs:
           java-version: '21'
           cache: 'maven'
       - name: Run check
-        run: mvn -B clean verify
+        run: ./mvnw -B clean verify
 
   release-snapshot:
     runs-on: "ubuntu-latest"
@@ -53,7 +53,7 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_SIGNING_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
       - name: Publish snapshot to maven central
-        run: mvn -B deploy -DskipTests -Pdeploy
+        run: ./mvnw -B deploy -DskipTests -Pdeploy
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
@@ -91,12 +91,12 @@ jobs:
           git add version.txt
           git commit -m "chore: set version to ${{ github.ref_name }}"
       - name: Publish to maven central
-        run: mvn -B deploy -DskipTests -Pdeploy
+        run: ./mvnw -B deploy -DskipTests -Pdeploy
       - name: Set version for next release
         id: next-release-version
         run: |
           NEXT_VERSION=$(echo ${{ github.ref_name }} | awk -F. -v OFS=. '{$NF += 1 ; print}')-SNAPSHOT
-          mvn versions:set -DnewVersion="${NEXT_VERSION}"
+          ./mvnw versions:set -DnewVersion="${NEXT_VERSION}"
           echo "next-version=${NEXT_VERSION}" >> $GITHUB_OUTPUT
       - name: Commit next release version
         run: |
