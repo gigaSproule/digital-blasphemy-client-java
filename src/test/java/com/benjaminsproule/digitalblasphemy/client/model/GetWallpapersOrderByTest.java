@@ -22,8 +22,7 @@ class GetWallpapersOrderByTest {
     public static Stream<Arguments> toStringArguments() {
         return Stream.of(
                 arguments(GetWallpapersOrderBy.DATE, "date"),
-                arguments(GetWallpapersOrderBy.NAME, "name")
-        );
+                arguments(GetWallpapersOrderBy.NAME, "name"));
     }
 
     @MethodSource("ofArguments")
@@ -35,8 +34,7 @@ class GetWallpapersOrderByTest {
     public static Stream<Arguments> ofArguments() {
         return Stream.of(
                 arguments("date", GetWallpapersOrderBy.DATE),
-                arguments("name", GetWallpapersOrderBy.NAME)
-        );
+                arguments("name", GetWallpapersOrderBy.NAME));
     }
 
     @Test
