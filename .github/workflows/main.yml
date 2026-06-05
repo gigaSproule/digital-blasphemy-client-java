@@ -82,7 +82,7 @@ jobs:
       - name: Configure git
         run: |
           git config user.name "gigasproule-actions-bot[bot]"
-          git config user.email "1162034+gigasproule-actions-bot[bot]@users.noreply.github.com"
+          git config user.email "201257440+gigasproule-actions-bot[bot]@users.noreply.github.com"
       - name: Set version for release
         run: |
           ./mvnw versions:set -DnewVersion="${{ github.ref_name }}"
