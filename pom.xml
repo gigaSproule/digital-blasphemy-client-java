@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.benjaminsproule</groupId>
@@ -11,6 +11,10 @@
     <description>A client to interact with the Digital Blasphemy API</description>
     <url>https://github.com/gigaSproule/digital-blasphemy-client-java/</url>
     <inceptionYear>2025</inceptionYear>
+
+    <scm>
+        <url>https://github.com/gigaSproule/digital-blasphemy-client-java/</url>
+    </scm>
 
     <licenses>
         <license>
@@ -79,7 +83,7 @@
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-annotations</artifactId>
             <version>${spotbugs.version}</version>
-<!--            <scope>provided</scope>-->
+            <!--            <scope>provided</scope>-->
         </dependency>
     </dependencies>
 
