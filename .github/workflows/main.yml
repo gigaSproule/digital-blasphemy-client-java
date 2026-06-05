@@ -81,8 +81,8 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Configure git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "gigasproule-actions-bot[bot]"
+          git config user.email "1162034+gigasproule-actions-bot[bot]@users.noreply.github.com"
       - name: Set version for release
         run: |
           ./mvnw versions:set -DnewVersion="${{ github.ref_name }}"
