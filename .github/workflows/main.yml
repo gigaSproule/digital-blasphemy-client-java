@@ -85,10 +85,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Set version for release
         run: |
-          echo "${{ github.ref_name }}" > version.txt
+          ./mvnw versions:set -DnewVersion="${{ github.ref_name }}"
       - name: Commit release version
         run: |
-          git add version.txt
+          git add pom.xml
           git commit -m "chore: set version to ${{ github.ref_name }}"
       - name: Publish to maven central
         run: ./mvnw -B deploy -DskipTests -Pdeploy
