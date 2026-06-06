@@ -5,7 +5,7 @@
 
     <groupId>com.benjaminsproule</groupId>
     <artifactId>digital-blasphemy-client</artifactId>
-    <version>0.0.11-SNAPSHOT</version>
+    <version>0.0.11</version>
     <packaging>jar</packaging>
     <name>Digital Blasphemy Client</name>
     <description>A client to interact with the Digital Blasphemy API</description>
