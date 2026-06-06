@@ -7,4 +7,5 @@ module com.benjaminsproule.digitalblasphemy.client {
     requires com.fasterxml.jackson.databind;
     requires static com.github.spotbugs.annotations;
     requires java.net.http;
+    requires org.slf4j;
 }

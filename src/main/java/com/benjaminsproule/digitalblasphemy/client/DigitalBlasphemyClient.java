@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +27,8 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
 
 public class DigitalBlasphemyClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DigitalBlasphemyClient.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient client = HttpClient.newHttpClient();
@@ -49,6 +53,7 @@ public class DigitalBlasphemyClient {
 
     @NonNull
     public CompletableFuture<GetAccountInformationResponse> getAccountInformation() {
+        LOGGER.debug("Get account information");
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(accountInformationPath)
                 .GET();
@@ -56,6 +61,7 @@ public class DigitalBlasphemyClient {
     }
 
     public CompletableFuture<GetWallpapersResponse> getWallpapers(@NonNull GetWallpapersRequest getWallpapersRequest) {
+        LOGGER.debug("Get wallpapers: {}", getWallpapersRequest);
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(getWallpapersUrl(getWallpapersRequest))
                 .GET();
@@ -110,7 +116,8 @@ public class DigitalBlasphemyClient {
 
     @Nullable
     public CompletableFuture<Wallpaper> getWallpaper(@NonNull GetWallpaperRequest getWallpaperRequest)
-            throws IOException, ResponseException, InterruptedException {
+            throws ResponseException {
+        LOGGER.debug("Get wallpaper: {}", getWallpaperRequest);
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(getWallpaperUrl(getWallpaperRequest))
                 .GET();
@@ -165,16 +172,20 @@ public class DigitalBlasphemyClient {
     }
 
     public CompletableFuture<Void> downloadWallpaper(Path filename, DownloadWallpaperRequest downloadWallpaperRequest) {
+        LOGGER.debug("Download wallpaper: {}", downloadWallpaperRequest);
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(downloadUrl(downloadWallpaperRequest))
                 .GET();
+        LOGGER.debug("Get wallpaper download URL");
         return executeRequest(request, DownloadWallpaperResponse.class)
                 .thenComposeAsync(downloadWallpaperResponse -> {
+                    LOGGER.debug("Downloading wallpaper from {}", downloadWallpaperResponse.download().url());
                     HttpRequest.Builder fileRequest = HttpRequest.newBuilder()
                             .uri(URI.create(downloadWallpaperResponse.download().url()))
                             .GET();
                     return executeRequest(fileRequest)
                             .thenAcceptAsync(body -> {
+                                LOGGER.debug("Writing response to {}", filename);
                                 try {
                                     Files.write(filename, body);
                                 } catch (IOException e) {
