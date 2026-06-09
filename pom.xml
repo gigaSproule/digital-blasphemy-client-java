@@ -146,7 +146,7 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>4.9.8.4</version>
+                        <version>4.9.8.5</version>
                         <configuration>
                             <excludeFilterFile>${project.basedir}/config/spotbugs/exclude.xml</excludeFilterFile>
                             <effort>Max</effort>
@@ -191,7 +191,7 @@
                     <plugin>
                         <groupId>org.pitest</groupId>
                         <artifactId>pitest-maven</artifactId>
-                        <version>1.25.3</version>
+                        <version>1.25.4</version>
                         <configuration>
                             <mutationThreshold>100</mutationThreshold>
                             <coverageThreshold>100</coverageThreshold>
