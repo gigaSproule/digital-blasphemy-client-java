@@ -41,7 +41,7 @@
         <assertj.version>3.27.7</assertj.version>
         <spotbugs.version>4.10.2</spotbugs.version>
         <wiremock.version>3.13.2</wiremock.version>
-        <junit.version>6.1.0</junit.version>
+        <junit.version>6.1.1</junit.version>
     </properties>
 
     <dependencies>
